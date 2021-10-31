@@ -12,8 +12,9 @@ else
     DB_NAME="matrix-demos-${GITHUB_USER}"
 fi
 
-ORG_NAME="demo"
+ORG_NAME="planetscale-demo"
 
+. use-pscale-docker-image.sh
 . wait-for-deploy-request-merged.sh
 
 raw_output=`pscale deploy-request list "$DB_NAME" --org "$ORG_NAME" --format json`

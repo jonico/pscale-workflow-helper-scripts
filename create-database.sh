@@ -1,9 +1,10 @@
 #!/bin/bash
-DB_NAME="demos-${GITHUB_USER}"
-ORG_NAME="demo"
+DB_NAME="matrix-demos-${GITHUB_USER}"
+ORG_NAME="planetscale-demo"
 BRANCH_NAME="main"
 CREDS="creds-${GITHUB_USER}"
 
+. use-pscale-docker-image.sh
 . wait-for-branch-readiness.sh
 
 # At the moment, service tokens do not allow DB creations or prod branch promotions, hence not using the service token.
@@ -11,6 +12,12 @@ pscale auth login
 unset PLANETSCALE_SERVICE_TOKEN
 
 pscale database create "$DB_NAME" --org "$ORG_NAME"
+# check if DB creation worked
+if [ $? -ne 0 ]; then
+  echo "Failed to create database $DB_NAME"
+  exit 1
+fi
+
 pscale branch create "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME"
 wait_for_branch_readiness 7 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 10
 echo "CREATE TABLE pixel_matrix (id bigint NOT NULL AUTO_INCREMENT, environment varchar(10) NOT NULL, cell varchar(10) NOT NULL, pixel_data longtext NOT NULL, PRIMARY KEY (id), KEY environment (environment), KEY cell (cell));" | pscale shell $DB_NAME $BRANCH_NAME --org $ORG_NAME
