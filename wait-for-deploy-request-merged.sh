@@ -14,7 +14,7 @@ function wait_for_deploy_request_merged {
     local count=0
     local wait=1
 
-    echo "Checking if deploy request $number  is ready for use..."
+    echo "Checking if deploy request $number is ready for use..."
     while true; do
         local raw_output=`pscale deploy-request list "$db" --org "$org" --format json`
         # check return code, if not 0 then error
