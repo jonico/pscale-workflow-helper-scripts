@@ -1,4 +1,4 @@
-# PlanetScale pscale CLI helper scripts
+# PlanetScale pscale CLI helper scripts ([video walkthrough](https://www.youtube.com/watch?v=qAs-NNWvihQ))
 
 Ever wanted to automate a complex task with [pscale CLI](https://github.com/planetscale/cli) and needed a way to wait until asynchronous operations like branch creations or deploy request merges finished? This is a collection of helper scripts around the PlanetScale CLI to synchronously
 * [wait for branch creation to be completed](wait-for-branch-readiness.sh)
