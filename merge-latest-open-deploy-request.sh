@@ -1,9 +1,9 @@
 #!/bin/bash
 
 . use-pscale-docker-image.sh
-. wait-for-deploy-request-merged.sh
-. set-db-and-org-name.sh
 . authenticate-ps.sh
+. wait-for-deploy-request-merged.sh
+. set-db-and-org-and-branch-name.sh
 
 raw_output=`pscale deploy-request list "$DB_NAME" --org "$ORG_NAME" --format json`
 # check return code, if not 0 then error
@@ -38,6 +38,8 @@ if [[ $output =~ ^[0-9]+$ ]]; then
     if [ $? -ne 0 ]; then
         echo "Error: wait-for-deploy-request-merged returned non-zero exit code"
         exit 5
+    else
+        echo "Check out the deploy request merged at https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/deploy-requests/${output}"
     fi
 else
     echo "No open deployment request found: $raw_output"

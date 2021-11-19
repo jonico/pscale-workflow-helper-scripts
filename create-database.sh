@@ -1,17 +1,15 @@
 #!/bin/bash
 
-. set-db-and-org-name.sh
-. set-db-url.sh
-
 BRANCH_NAME=${BRANCH_NAME:-"main"}
-CREDS="creds-${GITHUB_USER}"
 
 . use-pscale-docker-image.sh
-. wait-for-branch-readiness.sh
 
 # At the moment, service tokens do not allow DB creations or prod branch promotions, hence not using the service token.
 unset PLANETSCALE_SERVICE_TOKEN
 . authenticate-ps.sh
+
+. set-db-and-org-and-branch-name.sh
+. wait-for-branch-readiness.sh
 
 pscale database create "$DB_NAME" --org "$ORG_NAME"
 # check if DB creation worked
@@ -41,16 +39,10 @@ pscale branch promote "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME"
 
 # grant service token permission to use the database if service token is set
 if [ -n "$PLANETSCALE_SERVICE_TOKEN_NAME" ]; then
+  echo "Granting access to new database for service tokens ..."
   pscale service-token add-access "$PLANETSCALE_SERVICE_TOKEN_NAME" approve_deploy_request connect_branch create_branch create_comment create_deploy_request delete_branch read_branch read_deploy_request connect_production_branch  --database "$DB_NAME" --org "$ORG_NAME"
 fi
 
-raw_output=`pscale password create "$DB_NAME" "$BRANCH_NAME" "$CREDS"  --org "$ORG_NAME" --format json`
-if [ $? -ne 0 ]; then
-  echo "Failed to create credentials for database $DB_NAME: $raw_output"
-  exit 1
-fi
+. create-branch-connection-string.sh
 
-MY_DB_URL=`echo "$raw_output" |  jq ". | \"mysql://\" + .id +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/${DB_NAME}\""`
-echo "Please set MY_DB_URL in your personal codespaces and action secrets to ${MY_DB_URL:1:${#MY_DB_URL}-2} and grant this repo access to it."
-echo "If you do not like to restart this Codespace, you would have to run the following command in your terminal:"
-echo "export MY_DB_URL=${MY_DB_URL}"
+create-branch-connection-string  "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" "creds-${BRANCH_NAME}"

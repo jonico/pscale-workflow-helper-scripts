@@ -1,0 +1,26 @@
+name: 01 - Create Database
+
+on:
+  workflow_dispatch
+
+jobs:
+
+  create-database:
+    name: "Create database - click here"
+    runs-on: ubuntu-latest
+        
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Create database - please click on displayed link to authenticate
+        timeout-minutes: 3
+        env:
+          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          ORG_NAME: ${{secrets.ORG_NAME}}
+          GITHUB_USER: ${{github.actor}}
+        run: ./create-database.sh
+      - name: Please set MY_DB_URL with instructions from step above
+        run: |
+          echo "Have a look at the end of the output of the previous step to find your one-time link with instructions how to set the database repo secret ..."
+          sleep 60
