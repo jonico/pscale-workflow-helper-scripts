@@ -9,6 +9,7 @@ BRANCH_NAME=${BRANCH_NAME:-"add-operation-column-and-index"}
 . set-db-and-org-and-branch-name.sh
 
 # delete the branch if it already exists
+echo "Trying to delete branch $BRANCH_NAME if it already existed ..."
 pscale branch delete "$DB_NAME" "$BRANCH_NAME" --force --org "$ORG_NAME" 1>/dev/null
 pscale branch create "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME"
 wait_for_branch_readiness 7 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 10
