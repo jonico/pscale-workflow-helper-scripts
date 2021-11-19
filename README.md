@@ -25,7 +25,7 @@ In case you like to see those helper scripts in action without any further manua
 
 ![image](https://user-images.githubusercontent.com/1872314/142615142-e60164a0-f441-47ee-b92e-ef20e22aca81.png)
 
-5. When you run the workflows, follow the Actions output where it will ask you to authenticate to PlanetScale by clicking the displayed links.
+5. When you run the workflows, follow the output where it will ask you to authenticate to PlanetScale by clicking the displayed links.
 
 ![image](https://user-images.githubusercontent.com/1872314/142614600-83d06471-b0bd-4c7a-81bb-d8836e547e78.png)
 
