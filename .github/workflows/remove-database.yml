@@ -1,0 +1,22 @@
+name: 05 - Remove Database
+
+on:
+  workflow_dispatch
+
+jobs:
+
+  remove-database:
+    name: "Remove database - click here"
+    runs-on: ubuntu-latest
+        
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Remove database - please click on displayed link to authenticate
+        timeout-minutes: 3
+        env:
+          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          ORG_NAME: ${{secrets.ORG_NAME}}
+          GITHUB_USER: ${{github.actor}}
+        run: ./remove-database.sh
