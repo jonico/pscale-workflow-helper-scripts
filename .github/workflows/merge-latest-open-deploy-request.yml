@@ -1,4 +1,4 @@
-name: 05 - Merge latest Deploy Request
+name: 03 - Merge latest Deploy Request
 
 on:
   workflow_dispatch
