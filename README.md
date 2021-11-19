@@ -7,7 +7,7 @@ Ever wanted to automate a complex task with [pscale CLI](https://github.com/plan
 * examples on how to make use of those scripts ([branches](add-operation-column-and-index.sh), [credentials](create-database.sh), [deploy requests](merge-latest-open-deploy-request.sh))
 * [run pscale from a Docker container](https://github.com/jonico/pscale-cli-helper-scripts/blob/main/use-pscale-docker-image.sh) and still use your local config files, service tokens and port forwarding
 
-## Zero-type Action workflows included :sparkles:
+## Zero-setup Action workflows included :sparkles:
 
 In case you like to see those helper scripts in action, just create a copy of this repo template, create a PlanetScale account and switch to the Actions tab:
 
