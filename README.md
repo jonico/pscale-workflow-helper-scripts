@@ -11,7 +11,7 @@ Ever wanted to automate a complex task with [pscale CLI](https://github.com/plan
 
 In case you like to see those helper scripts in action without any further manual configuration, just 
 
-* create a copy of this repo template by clicking on the green 'Use this template' button. Both private as well as public repo visibility will work.
+* [create a copy of this repo](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) by clicking on the green 'Use this template' button. Both private as well as public repo visibility will work.
 
 ![image](https://user-images.githubusercontent.com/1872314/141356169-d1dcc996-9e3f-41bc-b4cb-c96b5f0cb843.png)
 
