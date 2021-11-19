@@ -11,11 +11,11 @@ Ever wanted to automate a complex task with [pscale CLI](https://github.com/plan
 
 In case you like to see those helper scripts in action without any further manual configuration, just 
 
-1. [create a copy of this repo](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) by clicking on the green 'Use this template' button. Both private as well as public repo visibility will work.
+1. [Create a copy of this repo](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) by clicking on the green 'Use this template' button. Both private as well as public repo visibility will work.
 
 ![image](https://user-images.githubusercontent.com/1872314/141356169-d1dcc996-9e3f-41bc-b4cb-c96b5f0cb843.png)
 
-2. create a PlanetScale account:  If you have not done already, [sign up here](https://auth.planetscale.com/sign-up) for a PlanetScale account, you can have one database for free. Do not create a database yet though, this step will be automated as part of the first Action workflow.
+2. Create a PlanetScale account:  If you have not done already, [sign up here](https://auth.planetscale.com/sign-up) for a PlanetScale account, you can have one database for free. Do not create a database yet though, this step will be automated as part of the first Action workflow.
 
 3. Switch to the Actions tab in your repo
 
