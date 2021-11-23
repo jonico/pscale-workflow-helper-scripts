@@ -16,3 +16,10 @@ echo "Using org name ${ORG_NAME}"
 
 export BRANCH_NAME=${BRANCH_NAME:-"main"}
 echo "Using branch name ${BRANCH_NAME}"
+
+# if CI variable ist set
+if [ -n "$CI" ]; then
+    echo "::set-output name=DB_NAME::$DB_NAME"
+    echo "::set-output name=ORG_NAME::$ORG_NAME"
+    echo "::set-output name=BRANCH_NAME::$BRANCH_NAME"
+fi

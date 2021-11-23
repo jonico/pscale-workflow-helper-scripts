@@ -1,0 +1,99 @@
+name: XX - Create branch and PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: DB and PR branch name
+        required: true
+        default: "alter-matrix-table"
+      ddl_statements:
+        description: 'DDL statements to run in new branch'
+        required: true
+        default: 'ALTER TABLE pixel_matrix;'
+
+jobs:
+  create_branch_dr_and_pr:
+    name: Create branch/PR/DR - click here
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Validate parameters
+        id: validate_params
+        uses: actions/github-script@v3
+        env:
+          BRANCH_NAME: ${{ github.event.inputs.branch }}
+          DDL_STATEMENTS: ${{ github.event.inputs.ddl_statements }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branch_name = process.env.BRANCH_NAME;
+            const ddl_statements = process.env.DDL_STATEMENTS;
+
+            if (! /^[a-zA-Z0-9_-]+$/.test(branch_name)) {
+              const error = `The branch name contains illegal characters: ${branch_name}`;
+              core.error(error);
+              core.setFailed(error);
+            }
+
+            if (! /^.*;$/.test(ddl_statements)) {
+              const error = `The ddl statements do not end with an ;: ${ddl_statements}`;
+              core.error(error);
+              core.setFailed(error);
+            }
+
+            core.setOutput('branch_name', branch_name);
+            core.setOutput('ddl_statements', ddl_statements);
+      
+      - name: Checkout
+        uses: actions/checkout@v2
+    
+      - name: Create DDL statement file
+        id: create_actions-runner-environment
+        env:
+          DDL_STATEMENTS: ${{ steps.validate_params.outputs.ddl_statements }}
+          BRANCH_NAME: ${{ steps.validate_params.outputs.branch_name }}
+        run: |
+          echo "$DDL_STATEMENTS" > "${BRANCH_NAME}_DDL_STATEMENTS"
+
+      - name: Create DB branch and deploy request- if asked, please click on displayed link to authenticate
+        id: create-db-branch-and-dr
+        timeout-minutes: 3
+        env:
+          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
+          ORG_NAME: ${{secrets.ORG_NAME}}
+          GITHUB_USER: ${{github.actor}}
+          DDL_STATEMENTS: ${{ steps.validate_params.outputs.ddl_statements }}
+          BRANCH_NAME: ${{ steps.validate_params.outputs.branch_name }}
+        run: ./create-db-branch-dr-and-connection.sh "$BRANCH_NAME" "$DDL_STATEMENTS"
+
+      - name: Create corresponding Git branch and Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v3.7.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            branch: ${{ steps.validate_params.outputs.branch_name }}
+            title: PR/DR for branch ${{ steps.validate_params.outputs.branch_name }}
+            delete-branch: true
+            commit-message: "DDL statements for DB branch ${{ steps.validate_params.outputs.branch_name }}"
+            body: >
+              This PR contains the code changes needed to go along with the following database changes:
+
+              * __DB-Branch__: [${{ steps.create-db-branch-and-dr.outputs.branch_name }}](${{ steps.create-db-branch-and-dr.outputs.BRANCH_URL }})
+
+              * __Deploy-Request URL__: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_URL }}
+
+              * __Original DDL-Statements__: `${{ steps.validate_params.outputs.ddl_statements }}`
+
+              * __Branch connection info__: [One-time link](${{ steps.create-db-branch-and-dr.outputs.CONNECTION_STRING_LINK }})
+              
+              If you are ok with the DB changes and have carefully reviewed them, you can merge them with a `/ps-merge` comment
+
+      - name: Please check out branch and deployment request / PR created
+        run: |
+          echo "::notice ::Please check out deployment request and branch in created PR: ${{ steps.create_pr.outputs.pull-request-url }}"
+          sleep 10

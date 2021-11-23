@@ -50,6 +50,7 @@ EOF
         echo "::notice ::Please follow the link in the next line and click on 'Read the Secret!' to see the secret, branch specific connection string for various frameworks."
         local link=`curl -s -X POST -d "plain&secret=$SECRET_TEXT" https://shared-secrets-planetscale.herokuapp.com/`
         echo "$link"
+        echo "::set-output name=CONNECTION_STRING_LINK::${link}"
     fi
     export MY_DB_URL=$DB_URL
 }
