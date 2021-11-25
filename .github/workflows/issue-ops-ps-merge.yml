@@ -1,4 +1,4 @@
-name: Merge associated PlanetScale deploy request
+name: Merge schema changes in associated PlanetScale deploy request
 
 on:
   issue_comment:
