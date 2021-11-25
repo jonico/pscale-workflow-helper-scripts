@@ -1,4 +1,4 @@
-name: 07 - Del Operation Column & Index
+name: 04 - Del Operation Column & Index
 
 on:
   workflow_dispatch
