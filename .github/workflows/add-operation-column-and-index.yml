@@ -1,4 +1,4 @@
-name: 04 - Add Operation Column & Index
+name: 02 - Add Operation Column & Index
 
 on:
   workflow_dispatch
