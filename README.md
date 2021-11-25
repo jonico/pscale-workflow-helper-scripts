@@ -31,3 +31,14 @@ In case you like to see those helper scripts in action without any further manua
 
 ![image](https://user-images.githubusercontent.com/1872314/142614600-83d06471-b0bd-4c7a-81bb-d8836e547e78.png)
 
+### Issue-Ops based workflow
+
+The workflows covered so far have been all triggered as manual GitHub Action jobs. If you start the ["Create branch/PR for schema change"](https://github.com/jonico/pscale-cli-helper-scripts/actions/workflows/create-db-branch-and-pr-dr.yml) workflow, a pull request like [this one](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) will be created that is associated with a PlanetScale deploy request and the desired schema changes. Those schema changes can then be applied by adding a `/ps-merge`comment to the pull request. This IssueOps command will also create [GitHub deployment events](https://docs.github.com/en/rest/guides/delivering-deployments), so that you could have other integrations and Action based workflows [hook into](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#deployment) the deployment lifecycle.
+
+![image](https://user-images.githubusercontent.com/1872314/143507761-4112d767-ed12-4353-828c-629ac83e9851.png)
+
+
+I am planning to add additional IssueOps commands, like `/ps-create`(to create a deploy request and database branch from an already existing PR), `/ps-approve`, `/ps-update` (to add additional DDL to an existing associated deploy request or just check how the schema diff would look now) and `/ps-delete`.
+
+Stay tuned for updates and any feedbacks / PRs are welcome 😊
+
