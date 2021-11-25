@@ -21,8 +21,7 @@ In case you like to see those helper scripts in action without any further manua
 
 3. Switch to the Actions tab in your repo
 
-![image](https://user-images.githubusercontent.com/1872314/143043935-93b2c974-59c7-47b4-bec6-57b982ffa76c.png)
-
+![image](https://user-images.githubusercontent.com/1872314/143506776-69faa942-475f-41d0-8667-07fd2106c06b.png)
 
 4. [Start the workflows manually](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow), in the displayed order.
 
