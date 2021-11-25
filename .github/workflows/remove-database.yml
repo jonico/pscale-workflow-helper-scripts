@@ -1,4 +1,4 @@
-name: 05 - Remove Database
+name: XX - Remove Database
 
 on:
   workflow_dispatch
