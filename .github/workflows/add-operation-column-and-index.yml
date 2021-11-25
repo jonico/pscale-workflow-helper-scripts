@@ -1,4 +1,4 @@
-name: 02 - Add Operation Column & Index
+name: 04 - Add Operation Column & Index
 
 on:
   workflow_dispatch
@@ -23,5 +23,5 @@ jobs:
         run: ./add-operation-column-and-index.sh
       - name: Please check out deployment request and branch connection string from step above
         run: |
-          echo "Please check out deployment request and branch connection stringfrom step above."
+          echo "Please check out deployment request and branch connection string from step above."
           sleep 10
