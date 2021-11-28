@@ -1,0 +1,516 @@
+name: ps-* IssueOps commands
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  prechecks:
+    name: Permission pre-check
+    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, '/ps-merge') || startsWith(github.event.comment.body, '/ps-create'))
+    outputs:
+      ref: ${{steps.prechecks.outputs.ref}}
+      eyes: ${{steps.prechecks.outputs.eyes}}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check permissions and PR ref
+      id: prechecks
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const reactionRes = await github.reactions.createForIssueComment({
+            ...context.repo,
+            comment_id: ${{github.event.comment.id}},
+            content: 'eyes'
+          })
+
+          core.setOutput('eyes', reactionRes.data.id)
+
+          const permissionRes = await github.repos.getCollaboratorPermissionLevel(
+            {
+              ...context.repo,
+              username: context.actor
+            }
+          )
+          if (permissionRes.status !== 200) {
+            message = 'Permission check returns non-200 status: ${permissionRes.status}'
+            core.setOutput('error', message)
+            throw new Error(message)
+          }
+          const actorPermission = permissionRes.data.permission
+          if (!['admin', 'write'].includes(actorPermission)) {
+              message = '👋  __' + context.actor + '__, seems as if you have not admin/write permission to /ps-merge this DR, permissions: ${actorPermission}'
+              core.setOutput('error', message)
+              throw new Error(message)
+          }
+
+          pr = await github.pulls.get(
+            {
+              ...context.repo,
+              pull_number: context.issue.number
+            }
+          )
+
+          if (pr.status !== 200) {
+            message = 'Could not retrieve PR info: ${permissionRes.status}'
+            core.setOutput('error', message)
+            throw new Error(message)
+          }
+
+          core.setOutput('ref', pr.data.head.ref)
+
+    - name: Pre-Check-Failed
+      id: precheck-failed
+      if: failure()
+      uses: actions/github-script@v3
+      env:
+        message: ${{steps.prechecks.outputs.error}}
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+          const { message } = process.env;
+          // check if message is null or empty
+          if (!message || message.length === 0) {
+            message = 'Unknown error, [check logs](' + log_url + ') for more details.'
+          }
+
+          github.issues.createComment({
+            ...context.repo,
+            issue_number: context.issue.number,
+            body: message
+          })
+
+          await github.reactions.createForIssueComment({
+            ...context.repo,
+            comment_id: ${{github.event.comment.id}},
+            content: '-1'
+          })
+
+          await github.reactions.deleteForIssueComment({
+            ...context.repo,
+            comment_id: ${{github.event.comment.id}},
+            reaction_id: ${{steps.prechecks.outputs.eyes}}
+          })
+
+
+  act-on-ps-merge-request:
+    name: "/ps-merge - click here ..."
+    if: startsWith(github.event.comment.body, '/ps-merge')
+    needs: [prechecks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.prechecks.outputs.ref }}
+
+      - name: Get associated PlanetScale env
+        id: get-ps-env
+        env:
+          REF: ${{ needs.prechecks.outputs.ref }}
+        run: ./ps-env-${REF}.sh
+          
+      - name: Acknowledge /ps-merge request with context
+        id: acknowledge
+        env:
+          DEPLOY_REQUEST_URL: ${{ steps.get-ps-env.outputs.DEPLOY_REQUEST_URL }}
+          BRANCH_NAME: ${{ steps.get-ps-env.outputs.BRANCH_NAME }}
+          BRANCH_URL: ${{ steps.get-ps-env.outputs.BRANCH_URL }}
+          DB_NAME: ${{ steps.get-ps-env.outputs.DB_NAME }}
+          ORG_NAME: ${{ steps.get-ps-env.outputs.ORG_NAME }}
+          REF: ${{ needs.prechecks.outputs.ref }}
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, REF } = process.env;
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+
+            const commentBody = `\
+            👋 __${context.actor}__, [merging](${DEPLOY_REQUEST_URL}) schema changes associated with database branch [__${BRANCH_NAME}__](${BRANCH_URL}) now ...
+            
+            You can watch the progress and authorize access [here](${log_url}).
+            `;
+
+            await github.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            })
+
+            deployment = await github.repos.createDeployment({
+              ...context.repo,
+              ref: REF,
+              task: 'merge-db-schema-change',
+              auto_merge: false,
+              required_contexts: [],
+              environment:  ORG_NAME + '/' + DB_NAME + '/' + BRANCH_NAME,
+              description: 'Schema changes for database branch ' + BRANCH_NAME,
+              payload:  { DB_NAME: DB_NAME, ORG_NAME: ORG_NAME, DEPLOY_REQUEST_URL: DEPLOY_REQUEST_URL, BRANCH_NAME: BRANCH_NAME},
+              production_environment: false,
+              transient_environment: false
+            });
+
+            core.setOutput('deployment_id', deployment.data.id)
+
+            github.repos.createDeploymentStatus({
+              mediaType: {
+                previews: ["flash-preview", "ant-man"]
+              },
+              ...context.repo,
+              deployment_id: deployment.data.id,
+              state: 'in_progress',
+              description: 'Merging schema changes on branch ' + BRANCH_NAME + ' ...',
+              environment_url: DEPLOY_REQUEST_URL,
+              log_url: log_url
+            })
+          
+      - name: Merging schema changes - if asked, please click on displayed link to authenticate
+        id: merge-dr
+        timeout-minutes: 10
+        env:
+          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
+          GITHUB_USER: ${{github.actor}}
+          REF: ${{ needs.prechecks.outputs.ref }}
+
+        run: |
+          . ps-env-${REF}.sh && ./merge-deploy-request.sh $DEPLOY_REQUEST_NUMBER
+
+      - name: Schema change merge succeeded
+        id: merging-succeeded
+        if: success()
+        uses: actions/github-script@v3
+        env:
+          DEPLOY_REQUEST_URL: ${{ steps.get-ps-env.outputs.DEPLOY_REQUEST_URL }}
+          BRANCH_NAME: ${{ steps.get-ps-env.outputs.BRANCH_NAME }}
+          BRANCH_URL: ${{ steps.get-ps-env.outputs.BRANCH_URL }}
+          DB_NAME: ${{ steps.get-ps-env.outputs.DB_NAME }}
+          ORG_NAME: ${{ steps.get-ps-env.outputs.ORG_NAME }}
+          deployment_id: ${{ steps.acknowledge.outputs.deployment_id }}
+          BRANCH_DIFF: ${{ steps.merge-dr.outputs.BRANCH_DIFF }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, deployment_id, BRANCH_DIFF } = process.env;
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            github.repos.createDeploymentStatus({
+              ...context.repo,
+              deployment_id: deployment_id,
+              state: 'success',
+              description: 'Schema changes merged successfully from branch ' + BRANCH_NAME + ' :tada:',
+              target_url: DEPLOY_REQUEST_URL,
+              log_url: log_url
+            })
+        
+            const commentBody = `\
+            ### Schema changes merged successfully :tada:
+
+            * :seedling: __DB-Branch__: [${BRANCH_NAME}](${BRANCH_URL})
+            * :train2: [Deploy request](${DEPLOY_REQUEST_URL})
+
+            <details>
+            <summary>🚀 Schema changes applied</summary>
+            
+            \`\`\`
+            ${BRANCH_DIFF}
+            \`\`\`
+
+            </details>
+            
+            `;
+            
+            github.issues.createComment({
+              ...context.repo,
+              issue_number: ${{ github.event.issue.number }},
+              body: commentBody
+            });
+
+            await github.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              content: '+1'
+            })
+
+            await github.reactions.deleteForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              reaction_id: ${{needs.prechecks.outputs.eyes}}
+            })
+
+      - name: Merging schema change failed
+        id: merging-failed
+        if: cancelled() || failure()
+        uses: actions/github-script@v3
+        env:
+          DEPLOY_REQUEST_URL: ${{ steps.get-ps-env.outputs.DEPLOY_REQUEST_URL }}
+          BRANCH_NAME: ${{ steps.get-ps-env.outputs.BRANCH_NAME }}
+          BRANCH_URL: ${{ steps.get-ps-env.outputs.BRANCH_URL }}
+          DB_NAME: ${{ steps.get-ps-env.outputs.DB_NAME }}
+          ORG_NAME: ${{ steps.get-ps-env.outputs.ORG_NAME }}
+          deployment_id: ${{ steps.acknowledge.outputs.deployment_id }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, deployment_id } = process.env;
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            github.repos.createDeploymentStatus({
+              ...context.repo,
+              deployment_id: deployment_id,
+              state: 'failure',
+              description: 'Merging schema change failed for branch __' + BRANCH_NAME + '__ :cry:',
+              environment_url: DEPLOY_REQUEST_URL,
+              log_url: log_url
+            })
+
+            github.issues.createComment({
+              ...context.repo,
+              issue_number: ${{ github.event.issue.number }},
+              body: `Merging schema change failed for branch [__${BRANCH_NAME}__](${BRANCH_URL}) :cry:. [View error logs](${log_url}).`
+            })
+
+            await github.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              content: '-1'
+            })
+
+            await github.reactions.deleteForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              reaction_id: ${{needs.prechecks.outputs.eyes}}
+            })
+
+  act-on-ps-create-request:
+    name: "/ps-create - click here ..."
+    if: startsWith(github.event.comment.body, '/ps-create')
+    needs: [prechecks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validating command and associated PS env
+        id: validate_params
+        env:
+          REF: ${{ needs.prechecks.outputs.ref }}
+          comment: ${{ github.event.comment.body }}
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { REF, comment } = process.env;
+
+            // check if comment starts with '/ps-create' and is only followed by whitespaces
+            const regexCommandWithoutParameters = /^\/ps-create\s*$/
+
+            // check if comment starts with '/ps-create' and is followed by a valid DDL
+            const regexCommandWithDDL = /^\/ps-create\s+"([^"]*)"\s*$/
+
+            // check if comment starts with '/ps-create' and is followed by a branch name with only alphanumeric characters and '-' and '_'
+            const regexCommandWithBranchName = /^\/ps-create\s+([a-zA-Z0-9-_]*)\s*$/
+
+            // check if comment starts with '/ps-create', is followed by a branch name with only alpha numeric characters and '-' and "_" and the followed by whitespaces and then a valid DDL
+            const regexCommandWithBranchAndParameters = /^\/ps-create\s+([a-zA-Z0-9-_]+)\s*"([^"]*)"\s*$/
+            
+            BRANCH_NAME = REF
+            DDL_STATEMENTS = ""
+
+            // check which of the four regexes above matches the comment, override BRANCH_NAME and DDL_STATEMENTS if present, error if none of the above matches
+            if (regexCommandWithoutParameters.test(comment)) {
+              console.log("/ps-create command without parameters")
+            } else if (regexCommandWithDDL.test(comment)) {
+              console.log("/ps-create command with DDL")
+              DDL_STATEMENTS = comment.match(regexCommandWithDDL)[1]
+            } else if (regexCommandWithBranchName.test(comment)) {
+              console.log("/ps-create command with branch name")
+              BRANCH_NAME = comment.match(regexCommandWithBranchName)[1]
+            } else if (regexCommandWithBranchAndParameters.test(comment)) {
+              console.log("/ps-create command with branch name and parameters")
+              BRANCH_NAME = comment.match(regexCommandWithBranchAndParameters)[1]
+              DDL_STATEMENTS = comment.match(regexCommandWithBranchAndParameters)[2]
+            } else {
+              message = 'Invalid command, please use \`/ps-create`, \`/ps-create "<DDL>"\`, or \`/ps-create <branch> "<DDL>"\`.'
+              core.setOutput('error', message)
+              throw new Error(message)
+            }
+            
+            core.info("DB branch name: " + BRANCH_NAME)
+            core.setOutput('BRANCH_NAME',  BRANCH_NAME)
+            core.info("DDL statements: " + DDL_STATEMENTS)
+            core.setOutput('DDL_STATEMENTS',  DDL_STATEMENTS)
+
+            const ps_env_name = 'ps-env-' + REF + ".sh"
+            // check whether file ps_env_name exists in the repo and given ref
+            try {
+              const response = await github.repos.getContent({
+                ...context.repo,
+                path: ps_env_name,
+                ref: REF
+              })
+              if (response.data.content) {
+                message = 'Script ' + ps_env_name + ' already exists, please use \`/ps-update "<DDL>"\` to update existing env.'
+                core.setOutput('error', message)
+                throw new Error(message)
+              }
+            } catch (error) {
+              // check error code and rethrow if not 404
+              if (error.status !== 404) {
+                throw error
+              }
+            }
+            
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            
+            const commentBody = `\
+            👋 __${context.actor}__, creating DB branch __${BRANCH_NAME}__ for Git branch __${REF}__ now ...
+            
+            You can watch the progress and authorize access [here](${log_url}).
+            `;
+            
+            await github.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            })
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.prechecks.outputs.ref }}
+      
+      - name: Create DB branch and deploy request- if asked, please click on displayed link to authenticate
+        id: create-db-branch-and-dr
+        timeout-minutes: 3
+        env:
+          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
+          ORG_NAME: ${{secrets.ORG_NAME}}
+          GITHUB_USER: ${{github.actor}}
+          DDL_STATEMENTS: ${{ steps.validate_params.outputs.DDL_STATEMENTS }}
+          BRANCH_NAME: ${{ steps.validate_params.outputs.BRANCH_NAME }}
+        run: | 
+          ./create-db-branch-dr-and-connection.sh "$BRANCH_NAME" "$DDL_STATEMENTS"
+
+      - name: Write information about associated PS database entities
+        env:
+          BRANCH_NAME: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_NAME }} 
+          REF: ${{ needs.prechecks.outputs.ref }}
+          DB_NAME: ${{ steps.create-db-branch-and-dr.outputs.DB_NAME }}
+          ORG_NAME: ${{ steps.create-db-branch-and-dr.outputs.ORG_NAME }}
+          DEPLOY_REQUEST_NUMBER: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_NUMBER }}
+          DEPLOY_REQUEST_URL: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_URL }}
+          BRANCH_URL: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_URL }}
+        run: |
+          envsubst < ps-env-template.sh > ps-env-${REF}.sh
+          chmod a+x ps-env-${REF}.sh
+
+      - name: Commit changes
+        uses: elstudio/actions-js-build/commit@v4
+        with:
+          commitMessage: Add PS environment for branch ${{ steps.create-db-branch-and-dr.outputs.BRANCH_NAME }}
+
+      - name: Database branch and DR creation succeeded
+        id: ps-create-succeeded
+        if: success()
+        uses: actions/github-script@v3
+        env:
+          DEPLOY_REQUEST_URL: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_URL }}
+          BRANCH_NAME: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_NAME }}
+          BRANCH_URL: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_URL }}
+          DB_NAME: ${{ steps.create-db-branch-and-dr.outputs.DB_NAME }}
+          ORG_NAME: ${{ steps.create-db-branch-and-dr.ORG_NAME }}
+          DDL_STATEMENTS: ${{ steps.validate_params.outputs.DDL_STATEMENTS }}
+          BRANCH_DIFF: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_DIFF }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, DDL_STATEMENTS, BRANCH_DIFF } = process.env;
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            
+            const commentBody = `\
+            ### Database branch and deploy request created successfully :tada:
+
+            * :seedling: __DB-Branch__: [${BRANCH_NAME}](${BRANCH_URL})
+            * :train2: [Deploy request](${DEPLOY_REQUEST_URL})
+            * :lock: __Branch connection info__: [One-time link](${{ steps.create-db-branch-and-dr.outputs.CONNECTION_STRING_LINK }})
+
+            <details>
+            <summary>:scroll: Proposed DDL-Statements:</summary>
+            
+            \`\`\`
+            ${DDL_STATEMENTS}
+            \`\`\`
+
+            </details>
+
+            <details>
+            <summary>📖 Calculated schema changes:</summary>
+            
+            \`\`\`
+            ${BRANCH_DIFF}
+            \`\`\`
+
+            </details>
+            
+            `;
+            
+            github.issues.createComment({
+              ...context.repo,
+              issue_number: ${{ github.event.issue.number }},
+              body: commentBody
+            });
+
+            await github.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              content: '+1'
+            })
+
+            await github.reactions.deleteForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              reaction_id: ${{needs.prechecks.outputs.eyes}}
+            })
+
+      - name: /ps-create failed
+        id: ps-create-failed
+        if: cancelled() || failure()
+        uses: actions/github-script@v3
+        env:
+          REF: ${{ needs.prechecks.outputs.ref }}
+          message: ${{steps.validate_params.outputs.error}}
+          DEPLOY_REQUEST_URL: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_URL }}
+          BRANCH_NAME: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_NAME }}
+          BRANCH_URL: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_URL }}
+          DB_NAME: ${{ steps.create-db-branch-and-dr.outputs.DB_NAME }}
+          ORG_NAME: ${{ steps.create-db-branch-and-dr.ORG_NAME }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |              
+            const { REF, message, DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME } = process.env;
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+
+            if (message === null || message === '') {
+              errorMessage = `Creating PS branch and DR failed for branch __${REF}__ :cry:. [View error logs](${log_url}).`
+            } else {
+              errorMessage = message
+            }
+
+            github.issues.createComment({
+                ...context.repo,
+                issue_number: ${{ github.event.issue.number }},
+                body: errorMessage
+              })
+
+
+            await github.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              content: '-1'
+            })
+
+            await github.reactions.deleteForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              reaction_id: ${{needs.prechecks.outputs.eyes}}
+            })
