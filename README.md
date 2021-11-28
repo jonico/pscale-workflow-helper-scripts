@@ -37,8 +37,15 @@ The workflows covered so far have been all triggered as manual GitHub Action job
 
 ![image](https://user-images.githubusercontent.com/1872314/143507761-4112d767-ed12-4353-828c-629ac83e9851.png)
 
+You can also create a database branch and deploy request based on an [already existing Pull Request](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) using `/ps-create`:
+![image](https://user-images.githubusercontent.com/1872314/143734380-132bdd39-b4bc-4ec0-b1e8-79d31748542c.png)
 
-I am planning to add additional IssueOps commands, like `/ps-create`(to create a deploy request and database branch from an already existing PR), `/ps-approve`, `/ps-update` (to add additional DDL to an existing associated deploy request or just check how the schema diff would look now) and `/ps-delete`.
+
+I am planning to add additional IssueOps commands, like
+- [x] `/ps-create`(to create a deploy request and database branch from an already existing PR)
+- [ ] `/ps-approve`
+- [ ] `/ps-update` (to add additional DDL to an existing associated deploy request or just check how the schema diff would look now)
+- [ ] `/ps-delete`
 
 Stay tuned for updates and any feedbacks / PRs are welcome 😊
 
