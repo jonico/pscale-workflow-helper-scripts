@@ -1,0 +1,4 @@
+.venv/*
+_actions/*
+__pycache__/*
+typescript
