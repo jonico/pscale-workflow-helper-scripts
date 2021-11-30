@@ -77,16 +77,17 @@ function create-diff-for-ci {
     local deploy_request="https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/deploy-requests/${deploy_request_number}"
     local BRANCH_DIFF="Diff could not be generated for deploy request $deploy_request"
 
+    local lines=""
     # read shell output line by line and assign to variable
     while read -r line; do
-        raw_output="$raw_output\n$line"
+        lines="$lines\n$line"
     done < <(pscale deploy-request diff "$DB_NAME" "$deploy_request_number" --org "$ORG_NAME" --format=json | jq .[].raw)
 
     
     if [ $? -ne 0 ]; then
-        BRANCH_DIFF="$BRANCH_DIFF : ${raw_output}"
+        BRANCH_DIFF="$BRANCH_DIFF : ${lines}"
     else
-        BRANCH_DIFF=$raw_output
+        BRANCH_DIFF=$lines
     fi
 
     if [ -n "$CI" ]; then
