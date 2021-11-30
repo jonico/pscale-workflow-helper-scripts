@@ -44,7 +44,9 @@ If you like to refresh the schema information of your branch or add additional D
 
 ![image](https://user-images.githubusercontent.com/1872314/144099735-8e023ecf-31ef-4129-82d0-3aa91d5c9777.png)
 
+Approvals can be done using `/ps-approve`:
 
+![image](https://user-images.githubusercontent.com/1872314/144145346-4263e70e-4eca-4bfe-b2b3-639cca99f1bd.png)
 
 I am planning to add additional IssueOps commands, like
 - [x] `/ps-create`(to create a deploy request and database branch from an already existing PR)
