@@ -50,7 +50,7 @@ Approvals can be done using `/ps-approve`:
 
 I am planning to add additional IssueOps commands, like
 - [x] `/ps-create`(to create a deploy request and database branch from an already existing PR)
-- [ ] `/ps-approve`
+- [x] `/ps-approve`
 - [x] `/ps-update` (to add additional DDL to an existing associated deploy request or just check how the schema diff would look now)
 - [ ] `/ps-delete`
 
