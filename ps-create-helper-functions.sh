@@ -65,7 +65,7 @@ function create-deploy-request {
     if [ -n "$CI" ]; then
         echo "::set-output name=DEPLOY_REQUEST_URL::$deploy_request"
         echo "::set-output name=DEPLOY_REQUEST_NUMBER::$deploy_request_number"
-        create-diff-for-ci "$DB_NAME" "$ORG_NAME" "$deploy_request_number"
+        create-diff-for-ci "$DB_NAME" "$ORG_NAME" "$deploy_request_number" "$BRANCH_NAME"
     fi   
 }
 
@@ -73,9 +73,13 @@ function create-diff-for-ci {
     local DB_NAME=$1
     local ORG_NAME=$2
     local deploy_request_number=$3 
+    local BRANCH_NAME=$4
 
     local deploy_request="https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/deploy-requests/${deploy_request_number}"
     local BRANCH_DIFF="Diff could not be generated for deploy request $deploy_request"
+
+    # updating schema for branch
+    pscale branch refresh-schema "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME"
 
     local lines=""
     # read shell output line by line and assign to variable
@@ -123,7 +127,7 @@ function create-deployment {
             exit 1
         fi
     else
-        create-diff-for-ci "$DB_NAME" "$ORG_NAME" "$deploy_request_number"
+        create-diff-for-ci "$DB_NAME" "$ORG_NAME" "$deploy_request_number" "$BRANCH_NAME"
     fi
 
     pscale deploy-request deploy "$DB_NAME" "$deploy_request_number" --org "$ORG_NAME"
