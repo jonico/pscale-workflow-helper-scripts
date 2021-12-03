@@ -48,11 +48,9 @@ Approvals can be done using `/ps-approve`:
 
 ![image](https://user-images.githubusercontent.com/1872314/144145346-4263e70e-4eca-4bfe-b2b3-639cca99f1bd.png)
 
-I am planning to add additional IssueOps commands, like
-- [x] `/ps-create`(to create a deploy request and database branch from an already existing PR)
-- [x] `/ps-approve`
-- [x] `/ps-update` (to add additional DDL to an existing associated deploy request or just check how the schema diff would look now)
-- [ ] `/ps-delete`
+Finally, you can delete the database branch associated with a Git branch using `/ps-delete`:
+
+![image](https://user-images.githubusercontent.com/1872314/144534299-a62a234b-2671-467b-9ec7-1cac89f85ff6.png)
 
 Stay tuned for updates and any feedbacks / PRs are welcome 😊
 
