@@ -74,7 +74,7 @@ function create-diff-for-ci {
     local ORG_NAME=$2
     local deploy_request_number=$3 
     local BRANCH_NAME=$4
-    local refresh_schema = $5
+    local refresh_schema=$5
 
     local deploy_request="https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/deploy-requests/${deploy_request_number}"
     local BRANCH_DIFF="Diff could not be generated for deploy request $deploy_request"
