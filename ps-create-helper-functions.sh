@@ -80,7 +80,7 @@ function create-diff-for-ci {
     local BRANCH_DIFF="Diff could not be generated for deploy request $deploy_request"
 
     # updating schema for branch
-    if [ -n "$refresh_schmema" ]; then
+    if [ -n "$refresh_schema" ]; then
         pscale branch refresh-schema "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME"
     fi  
 

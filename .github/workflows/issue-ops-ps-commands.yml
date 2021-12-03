@@ -7,7 +7,7 @@ on:
 jobs:
   prechecks:
     name: Permission pre-check
-    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, '/ps-merge') || startsWith(github.event.comment.body, '/ps-create') || startsWith(github.event.comment.body, '/ps-update') || startsWith(github.event.comment.body, '/ps-approve'))
+    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, '/ps-merge') || startsWith(github.event.comment.body, '/ps-create') || startsWith(github.event.comment.body, '/ps-update') || startsWith(github.event.comment.body, '/ps-approve') || startsWith(github.event.comment.body, '/ps-delete'))
     outputs:
       ref: ${{steps.prechecks.outputs.ref}}
       eyes: ${{steps.prechecks.outputs.eyes}}
@@ -348,7 +348,7 @@ jobs:
                 ref: REF
               })
               if (response.data.content) {
-                message = 'Script ' + ps_env_name + ' already exists, please use \`/ps-update "<DDL>"\` to update existing env.'
+                message = 'Script \`' + ps_env_name + '\` already exists, please use \`/ps-update "<DDL>"\` to update existing env.'
                 core.setOutput('error', message)
                 throw new Error(message)
               }
@@ -556,8 +556,6 @@ jobs:
                 throw new Error(message)
               }
               
-              core.info("DB branch name: " + BRANCH_NAME)
-              core.setOutput('BRANCH_NAME',  BRANCH_NAME)
               core.info("DDL statements: " + DDL_STATEMENTS)
               core.setOutput('DDL_STATEMENTS',  DDL_STATEMENTS)
 
@@ -574,7 +572,7 @@ jobs:
                 if (error.status !== 404) {
                   throw error
                 } else {
-                  message = 'Script ' + ps_env_name + ' does not exists, please use \`/ps-create <branch> "<DDL>"\` to create a DB branch first.'
+                  message = 'Script \`' + ps_env_name + '\` does not exists, please use \`/ps-create <branch> "<DDL>"\` to create a DB branch first.'
                   core.setOutput('error', message)
                   throw new Error(message)
                 }
@@ -583,7 +581,7 @@ jobs:
               const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
               
               const commentBody = `\
-              👋 __${context.actor}__, updating information ${DDL_UPDATED} of DB branch __${BRANCH_NAME}__ and Git branch __${REF}__ now ...
+              👋 __${context.actor}__, updating information ${DDL_UPDATED} of Git branch __${REF}__ now ...
               
               You can watch the progress and authorize access [here](${log_url}).
               `;
@@ -609,7 +607,6 @@ jobs:
             ORG_NAME: ${{secrets.ORG_NAME}}
             GITHUB_USER: ${{github.actor}}
             DDL_STATEMENTS: ${{ steps.validate_params.outputs.DDL_STATEMENTS }}
-            BRANCH_NAME: ${{ steps.validate_params.outputs.BRANCH_NAME }}
           run: . .pscale/ps-env-${REF}.sh && ./update-db-branch.sh "$BRANCH_NAME" "$DDL_STATEMENTS" "$DEPLOY_REQUEST_NUMBER"
 
         - name: Database branch and DR update succeeded
@@ -770,7 +767,7 @@ jobs:
                 if (error.status !== 404) {
                   throw error
                 } else {
-                  message = 'Script ' + ps_env_name + ' does not exists, please use \`/ps-create <branch> "<DDL>"\` to create a DB branch first.'
+                  message = 'Script \`' + ps_env_name + '\` does not exists, please use \`/ps-create <branch> "<DDL>"\` to create a DB branch first.'
                   core.setOutput('error', message)
                   throw new Error(message)
                 }
@@ -870,6 +867,161 @@ jobs:
 
               if (message === null || message === '') {
                 errorMessage = `Approving database changes for Git branch __${REF}__ failed :cry:. [View error logs](${log_url}).`
+              } else {
+                errorMessage = message
+              }
+
+              github.issues.createComment({
+                  ...context.repo,
+                  issue_number: ${{ github.event.issue.number }},
+                  body: errorMessage
+                })
+
+
+              await github.reactions.createForIssueComment({
+                ...context.repo,
+                comment_id: ${{github.event.comment.id}},
+                content: '-1'
+              })
+
+              await github.reactions.deleteForIssueComment({
+                ...context.repo,
+                comment_id: ${{github.event.comment.id}},
+                reaction_id: ${{needs.prechecks.outputs.eyes}}
+              })
+  act-on-ps-delete-request:
+      name: "/ps-delete - click here ..."
+      if: startsWith(github.event.comment.body, '/ps-delete')
+      needs: [prechecks]
+      runs-on: ubuntu-latest
+      steps:
+        - name: Validating command and associated PS env
+          id: validate_params
+          env:
+            REF: ${{ needs.prechecks.outputs.ref }}
+            comment: ${{ github.event.comment.body }}
+          uses: actions/github-script@v3
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+              const { REF, comment } = process.env;
+
+              // check if comment starts with '/ps-delete' and is only followed by whitespaces
+              const regexCommandWithoutParameters = /^\/ps-delete\s*$/
+
+              // check if the regexp above matches the comment, override BRANCH_NAME and DDL_STATEMENTS if present, error if none of the above matches
+              if (regexCommandWithoutParameters.test(comment)) {
+                console.log("/ps-delete command without parameters")
+              } else {
+                message = 'Invalid command, please use \`/ps-delete\`.'
+                core.setOutput('error', message)
+                throw new Error(message)
+              }
+
+              const ps_env_name = '.pscale/ps-env-' + REF + ".sh"
+              // check whether file ps_env_name exists in the repo and given ref
+              try {
+                const response = await github.repos.getContent({
+                  ...context.repo,
+                  path: ps_env_name,
+                  ref: REF
+                })
+              } catch (error) {
+                // check error code
+                if (error.status !== 404) {
+                  throw error
+                } else {
+                  message = 'Script \`' + ps_env_name + '\` does not exists, could not identify associated branch.'
+                  core.setOutput('error', message)
+                  throw new Error(message)
+                }
+              }
+              
+              const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+              
+              const commentBody = `\
+              👋 __${context.actor}__, deleting DB branch associated with Git branch __${REF}__ now ...
+              
+              You can watch the progress and authorize access [here](${log_url}).
+              `;
+              
+              await github.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              })
+
+        - name: Checkout
+          uses: actions/checkout@v2
+          with:
+            ref: ${{ needs.prechecks.outputs.ref }}
+
+        - name: Delete DB branch - if asked, please click on displayed link to authenticate
+          id: delete-db-branch
+          timeout-minutes: 3
+          env:
+            PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+            PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
+            REF: ${{ needs.prechecks.outputs.ref }}
+            ORG_NAME: ${{secrets.ORG_NAME}}
+            GITHUB_USER: ${{github.actor}}
+          run: . .pscale/ps-env-${REF}.sh && ./delete-db-branch.sh "$BRANCH_NAME"
+
+        - name: Database branch deleted
+          id: ps-delete-succeeded
+          if: success()
+          uses: actions/github-script@v3
+          env:
+            BRANCH_NAME: ${{ steps.delete-db-branch.outputs.BRANCH_NAME }}
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+              const { BRANCH_NAME } = process.env;
+              const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+              
+              const commentBody = `\
+              ### Deleted database branch successfully :tada:
+
+              * :seedling: __DB-Branch__: ${BRANCH_NAME}
+              `;
+              
+              github.issues.createComment({
+                ...context.repo,
+                issue_number: ${{ github.event.issue.number }},
+                body: commentBody
+              });
+
+              await github.reactions.createForIssueComment({
+                ...context.repo,
+                comment_id: ${{github.event.comment.id}},
+                content: '+1'
+              })
+
+              await github.reactions.deleteForIssueComment({
+                ...context.repo,
+                comment_id: ${{github.event.comment.id}},
+                reaction_id: ${{needs.prechecks.outputs.eyes}}
+              })
+             
+        - name: /ps-delete failed
+          id: ps-delete-failed
+          if: cancelled() || failure()
+          uses: actions/github-script@v3
+          env:
+            REF: ${{ needs.prechecks.outputs.ref }}
+            message: ${{steps.validate_params.outputs.error}}
+            BRANCH_NAME: ${{ steps.delete-db-branch.outputs.BRANCH_NAME }}
+            BRANCH_URL: ${{ steps.delete-db-branch.outputs.BRANCH_URL }}
+            DB_NAME: ${{ steps.delete-db-branch.outputs.DB_NAME }}
+            ORG_NAME: ${{ steps.delete-db-branch.ORG_NAME }}
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |              
+              const { REF, message, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME } = process.env;
+              const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+
+              if (message === null || message === '') {
+                errorMessage = `Deletion failed for DB branch associated with Git branch __${REF}__ :cry:. [View error logs](${log_url}).`
               } else {
                 errorMessage = message
               }

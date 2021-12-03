@@ -1,7 +1,7 @@
 function wait_for_branch_readiness {
     local retries=$1
     local db=$2
-    local branch=$3
+    local branch=${3,,}
     local org=$4
     
     # check whether fifth parameter is set, otherwise use default value
