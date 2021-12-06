@@ -1,6 +1,10 @@
 # PlanetScale pscale CLI helper scripts ([video walkthrough](https://www.youtube.com/watch?v=qAs-NNWvihQ))
 
-Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate asynchronous operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests? This is a collection of helper scripts around the PlanetScale CLI to synchronously
+Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate asynchronous operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests?
+
+![image](https://user-images.githubusercontent.com/1872314/144895567-85937eb8-25eb-4066-9863-8e834a108127.png)
+
+This is a collection of helper scripts around the PlanetScale CLI to synchronously
 * [wait for branch creation to be completed](wait-for-branch-readiness.sh)
 * [wait for deploy requests to be successfully merged](wait-for-deploy-request-merged.sh) (and get an update on the current migration status)
 * [DB connection string creation/parsing and extending scope of service tokens](create-database.sh)
