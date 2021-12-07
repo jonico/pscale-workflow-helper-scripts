@@ -1,6 +1,6 @@
 ---
 name: Add community usage example
-description: Add an example how you use the pscale workflows in your CI and win some swag :sparkles:
+description: Add an example how you use the pscale workflows in your CI and win some swag
 labels: [example]
 title: Deploy Octocat Generator on Azure
 body:
