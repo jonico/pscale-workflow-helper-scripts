@@ -8,7 +8,7 @@ body:
   attributes:
     value: |
       Great that you are interested in proving a usage example for the pscale workflows :tada:
-      Please enter the information :point_down: to add your exampple. In order to win some swag, please also tweet about your solution and mention @planetscaledata.
+      Please enter the information :point_down:  to add your exampple. In order to win some swag, please also tweet about your solution and mention @planetscaledata.
 - type: input
   id: example-url
   attributes:
