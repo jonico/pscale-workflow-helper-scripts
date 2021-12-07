@@ -11,6 +11,7 @@ jobs:
     outputs:
       ref: ${{steps.prechecks.outputs.ref}}
       eyes: ${{steps.prechecks.outputs.eyes}}
+      sha: ${{steps.prechecks.outputs.sha}}
     runs-on: ubuntu-latest
     steps:
     - name: Check permissions and PR ref
@@ -59,6 +60,7 @@ jobs:
           }
 
           core.setOutput('ref', pr.data.head.ref)
+          core.setOutput('sha', pr.data.head.sha)
 
     - name: Pre-Check-Failed
       id: precheck-failed
@@ -121,11 +123,12 @@ jobs:
           DB_NAME: ${{ steps.get-ps-env.outputs.DB_NAME }}
           ORG_NAME: ${{ steps.get-ps-env.outputs.ORG_NAME }}
           REF: ${{ needs.prechecks.outputs.ref }}
+          SHA: ${{ needs.prechecks.outputs.sha }}
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, REF } = process.env;
+            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, REF, SHA } = process.env;
             const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
 
             const commentBody = `\
@@ -166,6 +169,16 @@ jobs:
               environment_url: DEPLOY_REQUEST_URL,
               log_url: log_url
             })
+
+            // set commit status to pending
+            await github.repos.createCommitStatus({
+              ...context.repo,
+              context: '/ps-merge',
+              sha: SHA,
+              state: 'pending',
+              description: 'Merging schema changes on branch ' + BRANCH_NAME + ' ...',
+              target_url: log_url
+            })
           
       - name: Merging schema changes - if asked, please click on displayed link to authenticate
         id: merge-dr
@@ -191,10 +204,11 @@ jobs:
           ORG_NAME: ${{ steps.get-ps-env.outputs.ORG_NAME }}
           deployment_id: ${{ steps.acknowledge.outputs.deployment_id }}
           BRANCH_DIFF: ${{ steps.merge-dr.outputs.BRANCH_DIFF }}
+          SHA: ${{ needs.prechecks.outputs.sha }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, deployment_id, BRANCH_DIFF } = process.env;
+            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, deployment_id, BRANCH_DIFF, SHA } = process.env;
             const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
             github.repos.createDeploymentStatus({
               ...context.repo,
@@ -203,6 +217,16 @@ jobs:
               description: 'Schema changes merged successfully from branch ' + BRANCH_NAME + ' :tada:',
               target_url: DEPLOY_REQUEST_URL,
               log_url: log_url
+            })
+
+            // set commit status to success
+            await github.repos.createCommitStatus({
+              ...context.repo,
+              context: '/ps-merge',
+              sha: SHA,
+              state: 'success',
+              description: 'Schema changes merged successfully from branch ' + BRANCH_NAME,
+              target_url: log_url
             })
         
             const commentBody = `\
@@ -251,12 +275,20 @@ jobs:
           DB_NAME: ${{ steps.get-ps-env.outputs.DB_NAME }}
           ORG_NAME: ${{ steps.get-ps-env.outputs.ORG_NAME }}
           deployment_id: ${{ steps.acknowledge.outputs.deployment_id }}
+          SHA: ${{ needs.prechecks.outputs.sha }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, deployment_id } = process.env;
+            const { DEPLOY_REQUEST_URL, BRANCH_NAME, BRANCH_URL, DB_NAME, ORG_NAME, deployment_id, SHA } = process.env;
             const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
-            github.repos.createDeploymentStatus({
+            
+            await github.issues.createComment({
+              ...context.repo,
+              issue_number: ${{ github.event.issue.number }},
+              body: `Merging schema change failed for branch [__${BRANCH_NAME}__](${BRANCH_URL}) :cry:. [View error logs](${log_url}).`
+            })
+            
+            await github.repos.createDeploymentStatus({
               ...context.repo,
               deployment_id: deployment_id,
               state: 'failure',
@@ -265,10 +297,14 @@ jobs:
               log_url: log_url
             })
 
-            github.issues.createComment({
+            // set commit status to failure
+            await github.repos.createCommitStatus({
               ...context.repo,
-              issue_number: ${{ github.event.issue.number }},
-              body: `Merging schema change failed for branch [__${BRANCH_NAME}__](${BRANCH_URL}) :cry:. [View error logs](${log_url}).`
+              context: '/ps-merge',
+              sha: SHA,
+              state: 'failure',
+              description: 'Merging schema change failed for branch ' + BRANCH_NAME,
+              target_url: log_url
             })
 
             await github.reactions.createForIssueComment({
