@@ -1,0 +1,40 @@
+---
+name: Add community usage example
+description: Add an example how you use the pscale workflows in your CI and win some swag :sparkles:
+labels: [example,swag]
+title: Deploy Octocat Generator on Azure
+body:
+- type: markdown
+  attributes:
+    value: |
+      Great that you are interested in proving a usage example for the pscale workflows :tada:
+      Please enter the information :point_down: to add your exampple. In order to win some swag, please also tweet about your solution and mention @planetscaledata.
+- type: input
+  id: example-url
+  attributes:
+    label: URL to usage example (e.g PR or repo URL)
+    placeholder: "https://github.com/jonico/pscale-cli-helper-scripts/pull/2"
+  validations:
+    required: true
+- type: input
+  id: tweet-url
+  attributes:
+    label: Link to tweet mentioning your example and @planetscaledata
+    placeholder: "https://twitter.com/daniel2color/status/1467927588928724998"
+  validations:
+    required: optional
+- type: checkboxes
+  id: swag
+  attributes:
+    label: Like to get contacted in case you won some swag?
+    description: We will contact you if you are interested and if you tweeted and about your example.
+    options:
+      - label: Interested in swag
+        required: false
+- type: input
+  id: slack-account
+  attributes:
+    label: Slack account in Vitess slack channel
+    placeholder: "Johannes Nicolai"
+  validations:
+    required: optional
