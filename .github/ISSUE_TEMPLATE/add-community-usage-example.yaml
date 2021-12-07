@@ -22,7 +22,7 @@ body:
     label: Link to tweet mentioning your example and @planetscaledata
     placeholder: "https://twitter.com/daniel2color/status/1467927588928724998"
   validations:
-    required: optional
+    required: false
 - type: checkboxes
   id: swag
   attributes:
@@ -37,4 +37,4 @@ body:
     label: Slack account in Vitess slack channel
     placeholder: "Johannes Nicolai"
   validations:
-    required: optional
+    required: false
