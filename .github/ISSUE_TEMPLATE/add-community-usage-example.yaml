@@ -2,7 +2,7 @@
 name: Add community usage example
 description: Add an example how you use the pscale workflows in your CI and win some swag
 labels: [example]
-title: Add community usage example
+title: Title describing your use of the pscale workflows (e.g. Hibernate example)
 body:
 - type: markdown
   attributes:
