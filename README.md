@@ -13,6 +13,11 @@ This is a collection of helper scripts around the PlanetScale CLI to synchronous
 * [run pscale from a Docker container](https://github.com/jonico/pscale-cli-helper-scripts/blob/main/use-pscale-docker-image.sh) and still use your local config files, service tokens and port forwarding
 * [delete databases](https://github.com/jonico/pscale-cli-helper-scripts/blob/main/remove-database.sh)
 
+### Examples from the community how to make use of those pscale workflows
+
+In the [issues section of this repo](https://github.com/jonico/pscale-cli-helper-scripts/issues) you will find examples how to integrate your favorite framework and CI with the pscale workflow examples provided here. If you have our own examples you like to share with the commmunity and get the chance to win some swag, please [add your example here](https://github.com/jonico/pscale-cli-helper-scripts/issues/new/choose).
+
+
 ## Zero-setup Action workflows included :sparkles:
 
 In case you like to see those helper scripts in action without any further manual configuration, just 
