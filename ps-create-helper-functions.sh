@@ -17,7 +17,7 @@ function create-db-branch {
         exit 1
     fi
 
-    wait_for_branch_readiness 7 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 10
+    wait_for_branch_readiness 10 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 20
     if [ $? -ne 0 ]; then
         echo "Branch $BRANCH_NAME is not ready"
         exit 1
