@@ -11,7 +11,7 @@ unset PLANETSCALE_SERVICE_TOKEN
 . set-db-and-org-and-branch-name.sh
 . wait-for-branch-readiness.sh
 
-pscale database create "$DB_NAME" --region us-west --org "$ORG_NAME"
+pscale database create "$DB_NAME" --region us-east --org "$ORG_NAME"
 # check if DB creation worked
 if [ $? -ne 0 ]; then
   echo "Failed to create database $DB_NAME"
