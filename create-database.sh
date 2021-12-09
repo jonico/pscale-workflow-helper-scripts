@@ -11,7 +11,7 @@ unset PLANETSCALE_SERVICE_TOKEN
 . set-db-and-org-and-branch-name.sh
 . wait-for-branch-readiness.sh
 
-pscale database create "$DB_NAME" --org "$ORG_NAME"
+pscale database create "$DB_NAME" --region us-west --org "$ORG_NAME"
 # check if DB creation worked
 if [ $? -ne 0 ]; then
   echo "Failed to create database $DB_NAME"
@@ -27,7 +27,7 @@ if [ "$BRANCH_NAME" != "main" ]; then
   fi
 fi
 
-wait_for_branch_readiness 7 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 10
+wait_for_branch_readiness 10 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 30
 echo "CREATE TABLE pixel_matrix (id bigint NOT NULL AUTO_INCREMENT, environment varchar(10) NOT NULL, cell varchar(10) NOT NULL, pixel_data longtext NOT NULL, PRIMARY KEY (id), KEY environment (environment), KEY cell (cell));" | pscale shell $DB_NAME $BRANCH_NAME --org $ORG_NAME
 # check whether table creation was successful
 if [ $? -ne 0 ]; then
