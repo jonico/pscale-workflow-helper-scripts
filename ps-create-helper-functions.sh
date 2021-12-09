@@ -10,7 +10,7 @@ function create-db-branch {
         pscale branch delete "$DB_NAME" "$BRANCH_NAME" --force --org "$ORG_NAME" 2>/dev/null
     fi
 
-    pscale branch create "$DB_NAME" "$BRANCH_NAME" --region eu-west --org "$ORG_NAME"
+    pscale branch create "$DB_NAME" "$BRANCH_NAME" --region us-west --org "$ORG_NAME"
     # if branch creation fails, exit with error
     if [ $? -ne 0 ]; then
         echo "Failed to create branch $BRANCH_NAME for database $DB_NAME"
