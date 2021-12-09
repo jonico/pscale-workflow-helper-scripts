@@ -23,4 +23,4 @@ jobs:
       - name: Please set MY_DB_URL with instructions from step above
         run: |
           echo "Have a look at the end of the output of the previous step to find your one-time link with instructions how to set the database repo secret ..."
-          sleep 60
+          sleep 10
