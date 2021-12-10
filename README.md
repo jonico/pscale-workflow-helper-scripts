@@ -1,4 +1,4 @@
-# PlanetScale pscale CLI helper scripts ([Sign up for live demo in happy hour this Thursday](https://planetscale.com/event/emea-happy-half-hour))
+# PlanetScale pscale CLI helper scripts ([Recording from live demo at PlanetScale Happy-Half-Hour](https://app.gong.io/e/c-share/?tkn=1pymjuaz2d4iwrw3xe4aqg4y6))
 
 Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate asynchronous operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests?
 
