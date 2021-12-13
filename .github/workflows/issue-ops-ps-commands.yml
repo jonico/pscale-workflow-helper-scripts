@@ -416,7 +416,7 @@ jobs:
       
       - name: Create DB branch and deploy request- if asked, please click on displayed link to authenticate
         id: create-db-branch-and-dr
-        timeout-minutes: 3
+        timeout-minutes: 5
         env:
           PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
           PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
