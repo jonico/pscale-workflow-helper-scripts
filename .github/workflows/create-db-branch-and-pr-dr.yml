@@ -57,6 +57,7 @@ jobs:
           PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
           PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
           ORG_NAME: ${{secrets.ORG_NAME}}
+          DB_NAME: ${{secrets.DB_NAME}}
           GITHUB_USER: ${{github.actor}}
           DDL_STATEMENTS: ${{ steps.validate_params.outputs.ddl_statements }}
           BRANCH_NAME: ${{ steps.validate_params.outputs.branch_name }}
