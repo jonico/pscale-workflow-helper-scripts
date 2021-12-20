@@ -3,6 +3,9 @@ name: 02 - Add Operation Column & Index
 on:
   workflow_dispatch
 
+env:
+  pscale_base_directory: .pscale
+
 jobs:
 
   add-operation-column-and-index:
@@ -21,6 +24,7 @@ jobs:
           ORG_NAME: ${{secrets.ORG_NAME}}
           DB_NAME: ${{secrets.DB_NAME}}
           GITHUB_USER: ${{github.actor}}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: ./add-operation-column-and-index.sh
       - name: Please check out deployment request and branch connection string from step above
         run: |

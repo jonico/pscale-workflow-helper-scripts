@@ -1,5 +1,8 @@
 name: Create branch/PR for schema change
 
+env:
+  pscale_base_directory: .pscale
+
 on:
   workflow_dispatch:
     inputs:
@@ -61,6 +64,7 @@ jobs:
           GITHUB_USER: ${{github.actor}}
           DDL_STATEMENTS: ${{ steps.validate_params.outputs.ddl_statements }}
           BRANCH_NAME: ${{ steps.validate_params.outputs.branch_name }}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: | 
           ./create-db-branch-dr-and-connection.sh "$BRANCH_NAME" "$DDL_STATEMENTS"
 
@@ -72,10 +76,11 @@ jobs:
           DEPLOY_REQUEST_NUMBER: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_NUMBER }}
           DEPLOY_REQUEST_URL: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_URL }}
           BRANCH_URL: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_URL }}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: |
-          mkdir -p .pscale
-          envsubst < ps-env-template.sh > .pscale/ps-env-${BRANCH_NAME}.sh
-          chmod a+x .pscale/ps-env-${BRANCH_NAME}.sh
+          mkdir -p ../env/
+          envsubst < ps-env-template.sh > ../env/ps-env-${BRANCH_NAME}.sh
+          chmod a+x ../env/ps-env-${BRANCH_NAME}.sh
            
 
       - name: Create corresponding Git branch and Pull Request

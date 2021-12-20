@@ -4,6 +4,10 @@ on:
   issue_comment:
     types: [created]
 
+env:
+  pscale_base_directory: .pscale
+
+
 jobs:
   prechecks:
     name: Permission pre-check
@@ -112,7 +116,8 @@ jobs:
         id: get-ps-env
         env:
           REF: ${{ needs.prechecks.outputs.ref }}
-        run: .pscale/ps-env-${REF}.sh
+        working-directory: ${{env.pscale_base_directory}}
+        run: env/ps-env-${REF}.sh
           
       - name: Acknowledge /ps-merge request with context
         id: acknowledge
@@ -188,9 +193,9 @@ jobs:
           PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
           GITHUB_USER: ${{github.actor}}
           REF: ${{ needs.prechecks.outputs.ref }}
-
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: |
-          . .pscale/ps-env-${REF}.sh && ./merge-deploy-request.sh $DEPLOY_REQUEST_NUMBER
+          . ../env/ps-env-${REF}.sh && ./merge-deploy-request.sh $DEPLOY_REQUEST_NUMBER
 
       - name: Schema change merge succeeded
         id: merging-succeeded
@@ -215,7 +220,7 @@ jobs:
               deployment_id: deployment_id,
               state: 'success',
               description: 'Schema changes merged successfully from branch ' + BRANCH_NAME + ' :tada:',
-              target_url: DEPLOY_REQUEST_URL,
+              environment_url: DEPLOY_REQUEST_URL,
               log_url: log_url
             })
 
@@ -330,11 +335,12 @@ jobs:
         env:
           REF: ${{ needs.prechecks.outputs.ref }}
           comment: ${{ github.event.comment.body }}
+          baseDirectory: ${{env.pscale_base_directory}}
         uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { REF, comment } = process.env;
+            const { REF, comment, baseDirectory } = process.env;
 
             // check if comment starts with '/ps-create' and is only followed by whitespaces
             const regexCommandWithoutParameters = /^\/ps-create\s*$/
@@ -375,7 +381,7 @@ jobs:
             core.info("DDL statements: " + DDL_STATEMENTS)
             core.setOutput('DDL_STATEMENTS',  DDL_STATEMENTS)
 
-            const ps_env_name = '.pscale/ps-env-' + REF + ".sh"
+            const ps_env_name = baseDirectory + '/env/ps-env-' + REF + ".sh"
             // check whether file ps_env_name exists in the repo and given ref
             try {
               const response = await github.repos.getContent({
@@ -425,6 +431,7 @@ jobs:
           GITHUB_USER: ${{github.actor}}
           DDL_STATEMENTS: ${{ steps.validate_params.outputs.DDL_STATEMENTS }}
           BRANCH_NAME: ${{ steps.validate_params.outputs.BRANCH_NAME }}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: | 
           ./create-db-branch-dr-and-connection.sh "$BRANCH_NAME" "$DDL_STATEMENTS"
 
@@ -437,10 +444,11 @@ jobs:
           DEPLOY_REQUEST_NUMBER: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_NUMBER }}
           DEPLOY_REQUEST_URL: ${{ steps.create-db-branch-and-dr.outputs.DEPLOY_REQUEST_URL }}
           BRANCH_URL: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_URL }}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: |
-          mkdir -p .pscale/
-          envsubst < ps-env-template.sh > .pscale/ps-env-${REF}.sh
-          chmod a+x .pscale/ps-env-${REF}.sh
+          mkdir -p ../env/
+          envsubst < ps-env-template.sh > ../env/ps-env-${BRANCH_NAME}.sh
+          chmod a+x ../env/ps-env-${REF}.sh
 
       - name: Commit changes
         uses: elstudio/actions-js-build/commit@v4
@@ -564,11 +572,12 @@ jobs:
           env:
             REF: ${{ needs.prechecks.outputs.ref }}
             comment: ${{ github.event.comment.body }}
+            baseDirectory: ${{env.pscale_base_directory}}
           uses: actions/github-script@v3
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             script: |
-              const { REF, comment } = process.env;
+              const { REF, comment, baseDirectory } = process.env;
 
               // check if comment starts with '/ps-update' and is only followed by whitespaces
               const regexCommandWithoutParameters = /^\/ps-update\s*$/
@@ -596,7 +605,7 @@ jobs:
               core.info("DDL statements: " + DDL_STATEMENTS)
               core.setOutput('DDL_STATEMENTS',  DDL_STATEMENTS)
 
-              const ps_env_name = '.pscale/ps-env-' + REF + ".sh"
+              const ps_env_name = baseDirectory + '/env/ps-env-' + REF + ".sh"
               // check whether file ps_env_name exists in the repo and given ref
               try {
                 const response = await github.repos.getContent({
@@ -643,7 +652,8 @@ jobs:
             REF: ${{ needs.prechecks.outputs.ref }}
             GITHUB_USER: ${{github.actor}}
             DDL_STATEMENTS: ${{ steps.validate_params.outputs.DDL_STATEMENTS }}
-          run: . .pscale/ps-env-${REF}.sh && ./update-db-branch.sh "$BRANCH_NAME" "$DDL_STATEMENTS" "$DEPLOY_REQUEST_NUMBER"
+          working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
+          run: . ../env/ps-env-${REF}.sh && ./update-db-branch.sh "$BRANCH_NAME" "$DDL_STATEMENTS" "$DEPLOY_REQUEST_NUMBER"
 
         - name: Database branch and DR update succeeded
           id: ps-update-succeeded
@@ -761,11 +771,12 @@ jobs:
           env:
             REF: ${{ needs.prechecks.outputs.ref }}
             comment: ${{ github.event.comment.body }}
+            baseDirectory: ${{env.pscale_base_directory}}
           uses: actions/github-script@v3
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             script: |
-              const { REF, comment } = process.env;
+              const { REF, comment, baseDirectory } = process.env;
 
               reviewComment = "LGTM"
 
@@ -790,7 +801,7 @@ jobs:
               
               core.setOutput('reviewComment', reviewComment)
 
-              const ps_env_name = '.pscale/ps-env-' + REF + ".sh"
+              const ps_env_name = baseDirectory + '/env/ps-env-' + REF + ".sh"
               // check whether file ps_env_name exists in the repo and given ref
               try {
                 const response = await github.repos.getContent({
@@ -837,7 +848,8 @@ jobs:
             REF: ${{ needs.prechecks.outputs.ref }}
             GITHUB_USER: ${{github.actor}}
             COMMENT: ${{steps.validate_params.outputs.reviewComment}}
-          run: . .pscale/ps-env-${REF}.sh && ./approve-deploy-request.sh "$DEPLOY_REQUEST_NUMBER" "$COMMENT"
+          working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
+          run: . ../env/ps-env-${REF}.sh && ./approve-deploy-request.sh "$DEPLOY_REQUEST_NUMBER" "$COMMENT"
 
         - name: Approved deploy request
           id: ps-approve-succeeded
@@ -935,11 +947,12 @@ jobs:
           env:
             REF: ${{ needs.prechecks.outputs.ref }}
             comment: ${{ github.event.comment.body }}
+            baseDirectory: ${{ env.pscale_base_directory }}
           uses: actions/github-script@v3
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             script: |
-              const { REF, comment } = process.env;
+              const { REF, comment, baseDirectory } = process.env;
 
               // check if comment starts with '/ps-delete' and is only followed by whitespaces
               const regexCommandWithoutParameters = /^\/ps-delete\s*$/
@@ -953,7 +966,7 @@ jobs:
                 throw new Error(message)
               }
 
-              const ps_env_name = '.pscale/ps-env-' + REF + ".sh"
+              const ps_env_name = baseDirectory + '/env/ps-env-' + REF + ".sh"
               // check whether file ps_env_name exists in the repo and given ref
               try {
                 const response = await github.repos.getContent({
@@ -999,7 +1012,8 @@ jobs:
             PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
             REF: ${{ needs.prechecks.outputs.ref }}
             GITHUB_USER: ${{github.actor}}
-          run: . .pscale/ps-env-${REF}.sh && ./delete-db-branch.sh "$BRANCH_NAME"
+          working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
+          run: . ../env/ps-env-${REF}.sh && ./delete-db-branch.sh "$BRANCH_NAME"
 
         - name: Database branch deleted
           id: ps-delete-succeeded

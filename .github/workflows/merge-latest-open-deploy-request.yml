@@ -2,6 +2,9 @@ name: 03 - Merge latest Deploy Request
 
 on:
   workflow_dispatch
+
+env:
+  pscale_base_directory: .pscale
     
 jobs:
 
@@ -21,6 +24,7 @@ jobs:
           ORG_NAME: ${{secrets.ORG_NAME}}
           DB_NAME: ${{secrets.DB_NAME}}
           GITHUB_USER: ${{github.actor}}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: ./merge-latest-open-deploy-request.sh
       - name: Please check out the result of your merge request from step above
         run: |

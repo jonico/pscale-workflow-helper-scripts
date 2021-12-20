@@ -1,4 +1,11 @@
 .venv/*
 _actions/*
 __pycache__/*
-typescript
+.pscale/cli-helper-scripts/typescript
+
+# do not publish macOS blergh
+._*
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes

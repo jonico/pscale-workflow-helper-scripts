@@ -3,6 +3,9 @@ name: XX - Remove Database
 on:
   workflow_dispatch
 
+env:
+  pscale_base_directory: .pscale
+
 jobs:
 
   remove-database:
@@ -20,4 +23,5 @@ jobs:
           ORG_NAME: ${{secrets.ORG_NAME}}
           DB_NAME: ${{secrets.DB_NAME}}
           GITHUB_USER: ${{github.actor}}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
         run: ./remove-database.sh
