@@ -5,13 +5,13 @@ Ever wanted to accomplish a complex database workflow with [pscale CLI](https://
 ![image](https://user-images.githubusercontent.com/1872314/144895567-85937eb8-25eb-4066-9863-8e834a108127.png)
 
 This is a collection of helper scripts around the PlanetScale CLI to synchronously
-* [wait for branch creation to be completed](wait-for-branch-readiness.sh)
-* [wait for deploy requests to be successfully merged](wait-for-deploy-request-merged.sh) (and get an update on the current migration status)
-* [DB connection string creation/parsing and extending scope of service tokens](create-database.sh)
-* examples on how create branches and deploy requests ([branches](add-operation-column-and-index.sh), [credentials](create-database.sh), [deploy requests](merge-latest-open-deploy-request.sh))
-* [creating one-time links](https://github.com/jonico/pscale-cli-helper-scripts/blob/main/create-branch-connection-string.sh) with connection info for feature branches that correspond to your preview environments
-* [run pscale from a Docker container](https://github.com/jonico/pscale-cli-helper-scripts/blob/main/use-pscale-docker-image.sh) and still use your local config files, service tokens and port forwarding
-* [delete databases](https://github.com/jonico/pscale-cli-helper-scripts/blob/main/remove-database.sh)
+* [wait for branch creation to be completed](.pscale/cli-helper-scripts/wait-for-branch-readiness.sh)
+* [wait for deploy requests to be successfully merged](.pscale/cli-helper-scripts/wait-for-deploy-request-merged.sh) (and get an update on the current migration status)
+* [DB connection string creation/parsing and extending scope of service tokens](.pscale/cli-helper-scripts/create-database.sh)
+* examples on how create branches and deploy requests ([branches](.pscale/cli-helper-scripts/add-operation-column-and-index.sh), [credentials](.pscale/cli-helper-scripts/create-database.sh), [deploy requests](.pscale/cli-helper-scripts/merge-latest-open-deploy-request.sh))
+* [creating one-time links](.pscale/cli-helper-scripts/create-branch-connection-string.sh) with connection info for feature branches that correspond to your preview environments
+* [run pscale from a Docker container](.pscale/cli-helper-scripts/use-pscale-docker-image.sh) and still use your local config files, service tokens and port forwarding
+* [delete databases](.pscale/cli-helper-scripts/remove-database.sh)
 
 ### Examples from the community how to make use of those pscale workflows
 
