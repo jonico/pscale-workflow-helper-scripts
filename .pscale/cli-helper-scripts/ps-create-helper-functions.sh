@@ -57,7 +57,12 @@ function create-deploy-request {
         echo "Deploy request could not be created: $raw_output"
         exit 1
     fi
-    deploy_request_number=`echo $raw_output | jq -r '.number'`
+    local deploy_request_number=`echo $raw_output | jq -r '.number'`
+    # if deploy request number is empty, then error
+    if [ -z "$deploy_request_number" ]; then
+        echo "Could not retrieve deploy request number: $raw_output"
+        exit 1
+    fi
 
     local deploy_request="https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/deploy-requests/${deploy_request_number}"
     echo "Check out the deploy request created at $deploy_request"
@@ -67,6 +72,75 @@ function create-deploy-request {
         echo "::set-output name=DEPLOY_REQUEST_NUMBER::$deploy_request_number"
         create-diff-for-ci "$DB_NAME" "$ORG_NAME" "$deploy_request_number" "$BRANCH_NAME"
     fi   
+}
+
+function create-deploy-request-info {
+    local DB_NAME=$1
+    local ORG_NAME=$2
+    local DEPLOY_REQUEST_NUMBER=$3
+
+    local raw_output=`pscale deploy-request show "$DB_NAME" "$DEPLOY_REQUEST_NUMBER" --org "$ORG_NAME" --format json`
+    if [ $? -ne 0 ]; then
+        echo "Deploy request could not be retrieved: $raw_output"
+        exit 1
+    fi
+    # extract the branch name from the deploy request
+    local branch_name=`echo $raw_output | jq -r '.branch'`
+
+    # check if the branch name is empty
+    if [ -z "$branch_name" ]; then
+        echo "Could not extract branch name from deploy request $DEPLOY_REQUEST_NUMBER"
+        exit 1
+    fi
+
+    export BRANCH_NAME="$branch_name"
+    local deploy_request="https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/deploy-requests/${DEPLOY_REQUEST_NUMBER}"
+
+    local branch_url="https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/${BRANCH_NAME}"
+    export BRANCH_URL="$branch_url"
+
+    # if CI variable is set, export deployment request info
+    if [ -n "$CI" ]; then
+        echo "::set-output name=BRANCH_NAME::$branch_name"
+        echo "::set-output name=DB_NAME::$DB_NAME"
+        echo "::set-output name=ORG_NAME::$ORG_NAME"
+        echo "::set-output name=DEPLOY_REQUEST_URL::$deploy_request"
+        echo "::set-output name=DEPLOY_REQUEST_NUMBER::$DEPLOY_REQUEST_NUMBER"
+        echo "::set-output name=BRANCH_URL::$branch_url"
+    fi
+}
+
+function create-branch-info {
+    local DB_NAME=$1
+    local BRANCH_NAME=$2
+    local ORG_NAME=$3
+
+    local raw_output=`pscale branch show "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json`
+    if [ $? -ne 0 ]; then
+        echo "Branch could not be retrieved: $raw_output"
+        exit 1
+    fi
+    # extract the branch name from the deploy request
+    local branch_name=`echo $raw_output | jq -r '.name'`
+
+    # check if the branch name is empty
+    if [ -z "$branch_name" ]; then
+        echo "Could not extract existing branch name from branch $BRANCH_NAME"
+        exit 1
+    fi
+
+    export BRANCH_NAME="$branch_name"
+    
+    local branch_url="https://app.planetscale.com/${ORG_NAME}/${DB_NAME}/${BRANCH_NAME}"
+    export BRANCH_URL="$branch_url"
+
+    # if CI variable is set, export branch info
+    if [ -n "$CI" ]; then
+        echo "::set-output name=BRANCH_NAME::$branch_name"
+        echo "::set-output name=DB_NAME::$DB_NAME"
+        echo "::set-output name=ORG_NAME::$ORG_NAME"
+        echo "::set-output name=BRANCH_URL::$branch_url"
+    fi
 }
 
 function create-diff-for-ci {
