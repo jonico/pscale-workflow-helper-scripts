@@ -7,7 +7,7 @@ Ever wanted to accomplish a complex database workflow with [pscale CLI](https://
 ![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
 
 This is a collection of helper scripts and building blocks around the PlanetScale CLI to
-* control PlanetScale branches and deploy requests directly from your Pull Requests (see [IssueOps section](#issue-ops-based-workflows))
+* attach, create, update, approve, merge and delete PlanetScale branches and deploy requests directly from your Pull Requests (see [IssueOps section](#issue-ops-based-workflows))
 * [wait for branch creation to be completed](.pscale/cli-helper-scripts/wait-for-branch-readiness.sh)
 * [wait for deploy requests to be successfully merged](.pscale/cli-helper-scripts/wait-for-deploy-request-merged.sh) (and get an update on the current migration status)
 * [DB connection string creation/parsing and extending scope of service tokens](.pscale/cli-helper-scripts/create-database.sh)
