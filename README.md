@@ -100,3 +100,24 @@ If you start the ["Create branch/PR for schema change"](https://github.com/jonic
 If you like to install the workflows in your own repository, follow the [installation steps](#installation).
 
 ## Configuration
+
+All scripts and IssueOps command in this repo have been designed to run successfully even if [zero configuration](#zero-setup-action-workflows-included-sparkles) was provided. If the defaut values do not fit your you, or you do not like to always authorize every action with the Web UI, here are the environment variables you can override in your CI/CD or set as [GitHub secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for your GitHub Action workflows to override default behavior.
+
+### DB_NAME
+
+***DB_NAME*** is name of your PlanetScale database. Unless you [attach](#ps-attach-attach-existing-planetscale-branch-or-deploy-request-to-your-pr) a specific branch or deploy request to your PR, it defaults to `example-db-<yourgithubaccount>`. If you rather like to change the source for the default DB name, it would be [this file](.pscale/cli-helper-scripts/set-db-and-org-and-branch-name.sh).
+
+### ORG_NAME
+
+***ORG_NAME*** is name of your PlanetScale organization. Unless you [attach](#ps-attach-attach-existing-planetscale-branch-or-deploy-request-to-your-pr) a specific branch or deploy request to your PR, it defaults to the first PlanetScale org you joined with your account. If you rather like to change the source for the default DB name, it would be [this file](.pscale/cli-helper-scripts/set-db-and-org-and-branch-name.sh).
+
+### PLANETSCALE_SERVICE_TOKEN_NAME and PLANETSCALE_SERVICE_TOKEN
+
+If you do not like to authorize actions by clicking on authorization links in the browser, you can [create PlanetScale service tokens](https://docs.planetscale.com/reference/service-tokens#create-service-tokens-using-the-planetscale-ui). Don't forget to set the [proper scopes](https://docs.planetscale.com/reference/service-tokens#add-database-access-permissions) for the database operations you like to automate.
+
+**Note:** While service tokens can be used to work with existing databases, there is currently no scope to create new databases. This is why the scripts / workflows to create entirely new databses will always prompt you to authenticate via the Web UI.
+
+### Initial table
+
+When you create a bew database from scratch, a default table called `pixel_matrix` will be created. If you like to change this behavior, modify [this file](pscale-cli-helper-scripts/blob/main/.pscale/cli-helper-scripts/create-database.sh).
+
