@@ -22,7 +22,7 @@ This is a collection of helper scripts around the PlanetScale CLI to synchronous
 You can create a database branch and deploy request in an [already existing Pull Request](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) using `/ps-create`:
 ![image](https://user-images.githubusercontent.com/1872314/143734380-132bdd39-b4bc-4ec0-b1e8-79d31748542c.png)
 
-### /ps-attach: Attach existing PlanetScale branch or DReploy Request to your PR
+### /ps-attach: Attach existing PlanetScale branch or Deploy Request to your PR
 
 If the PlanetScale deploy request or database branch and your pull request both exist already, you can use the `/ps-attach` command, followed by the PlanetScale URL to your branch/DR:
 
