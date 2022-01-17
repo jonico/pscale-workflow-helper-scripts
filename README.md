@@ -119,5 +119,5 @@ If you do not like to authorize actions by clicking on authorization links in th
 
 ### Initial table
 
-When you create a bew database from scratch, a default table called `pixel_matrix` will be created. If you like to change this behavior, modify [this file](pscale-cli-helper-scripts/blob/main/.pscale/cli-helper-scripts/create-database.sh).
+When you create a bew database from scratch, a default table called `pixel_matrix` will be created. If you like to change this behavior, modify [this file](.pscale/cli-helper-scripts/create-database.sh).
 
