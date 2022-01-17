@@ -2,11 +2,12 @@
 
 📺 [Recording from live demo at PlanetScale Happy-Half-Hour](https://youtu.be/l3oe7srRUZw?t=610)
 
-Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate asynchronous operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests?
+Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests?
 
 ![image](https://user-images.githubusercontent.com/1872314/144895567-85937eb8-25eb-4066-9863-8e834a108127.png)
 
-This is a collection of helper scripts around the PlanetScale CLI to synchronously
+This is a collection of helper scripts and building blocks around the PlanetScale CLI to
+* control PlanetScale branches and deploy requests directly from your Pull Requests (see [IssueOps section](#issue-ops-based-workflows))
 * [wait for branch creation to be completed](.pscale/cli-helper-scripts/wait-for-branch-readiness.sh)
 * [wait for deploy requests to be successfully merged](.pscale/cli-helper-scripts/wait-for-deploy-request-merged.sh) (and get an update on the current migration status)
 * [DB connection string creation/parsing and extending scope of service tokens](.pscale/cli-helper-scripts/create-database.sh)
@@ -16,6 +17,17 @@ This is a collection of helper scripts around the PlanetScale CLI to synchronous
 * [delete databases](.pscale/cli-helper-scripts/remove-database.sh)
 
 ## Issue-Ops based workflows
+
+### Installation
+
+To test out the IssueOps commands, either work on a [copy of this repo](https://github.com/jonico/pscale-cli-helper-scripts/generate) or run the following command in the root directory of your GitHub repo's workspace:
+
+```bash
+curl https://raw.githubusercontent.com/jonico/pscale-cli-helper-scripts/main/install.sh | bash
+git add .pscale .github/workflows
+git commit -m "Add pscale helper scripts and IssueOps workflows"
+git push
+```
 
 ### /ps-create: Create PlanetScale Deploy Request from your PR
 
@@ -53,7 +65,6 @@ Finally, you can delete the database branch associated with a Git branch using `
 ![image](https://user-images.githubusercontent.com/1872314/144534299-a62a234b-2671-467b-9ec7-1cac89f85ff6.png)
 
 Stay tuned for updates and any feedbacks / PRs are welcome 😊
-
 
 ## Zero-setup Action workflows included :sparkles:
 
