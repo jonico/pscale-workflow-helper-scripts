@@ -19,6 +19,8 @@ This is a collection of GitHub Workflows and general purpose CI/CD helper script
 
 ## Issue-Ops based workflows
 
+([GitHub Actions workflow source](.github/workflows/issue-ops-ps-commands.yml))
+
 ### Installation
 
 To test out the IssueOps commands, either work on a [copy of this repo](https://github.com/jonico/pscale-cli-helper-scripts/generate) or run the following command in the root directory of your GitHub repo's workspace:
