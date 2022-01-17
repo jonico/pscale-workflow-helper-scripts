@@ -1,4 +1,6 @@
-# PlanetScale pscale CLI helper scripts ([Recording from live demo at PlanetScale Happy-Half-Hour](https://youtu.be/l3oe7srRUZw?t=610))
+# PlanetScale pscale CLI helper scripts 
+
+📺 [Recording from live demo at PlanetScale Happy-Half-Hour](https://youtu.be/l3oe7srRUZw?t=610)
 
 Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate asynchronous operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests?
 
@@ -13,9 +15,44 @@ This is a collection of helper scripts around the PlanetScale CLI to synchronous
 * [run pscale from a Docker container](.pscale/cli-helper-scripts/use-pscale-docker-image.sh) and still use your local config files, service tokens and port forwarding
 * [delete databases](.pscale/cli-helper-scripts/remove-database.sh)
 
-### Examples from the community how to make use of those pscale workflows
+## Issue-Ops based workflows
 
-In the [issues section of this repo](https://github.com/jonico/pscale-cli-helper-scripts/issues) you will find examples how to integrate your favorite framework and CI with the pscale workflow examples provided here. If you have our own examples you like to share with the commmunity and get the chance to win some swag, please [add your example here](https://github.com/jonico/pscale-cli-helper-scripts/issues/new/choose).
+### /ps-create: Create PlanetScale Deploy Request from your PR
+
+You can create a database branch and deploy request in an [already existing Pull Request](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) using `/ps-create`:
+![image](https://user-images.githubusercontent.com/1872314/143734380-132bdd39-b4bc-4ec0-b1e8-79d31748542c.png)
+
+### /ps-attach: Attach existing PlanetScale branch or DReploy Request to your PR
+
+If the PlanetScale deploy request or database branch and your pull request both exist already, you can use the `/ps-attach` command, followed by the PlanetScale URL to your branch/DR:
+
+![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
+
+### /ps-update: Refresh schema info in your PR from your attached Deploy Request
+
+If you like to refresh the schema information of your branch or add additional DDL statements, use `/ps-update`:
+
+![image](https://user-images.githubusercontent.com/1872314/144099735-8e023ecf-31ef-4129-82d0-3aa91d5c9777.png)
+
+### /ps-approve: Approve Deploy Request from your PR
+
+Approvals can be done using `/ps-approve`:
+
+![image](https://user-images.githubusercontent.com/1872314/144145346-4263e70e-4eca-4bfe-b2b3-639cca99f1bd.png)
+
+### /ps-merge: Merge Deploy Request attached to your PR
+
+Schema changes in attached deploy requests can then be applied to production by adding a `/ps-merge` comment to the pull request. This IssueOps command will also create [GitHub deployment events](https://docs.github.com/en/rest/guides/delivering-deployments), so that you could have other integrations and Action based workflows [hook into](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#deployment) the deployment lifecycle.
+
+![image](https://user-images.githubusercontent.com/1872314/143507761-4112d767-ed12-4353-828c-629ac83e9851.png)
+
+### /ps-delete: Delete PlanetScale branch attached to your PR
+
+Finally, you can delete the database branch associated with a Git branch using `/ps-delete`:
+
+![image](https://user-images.githubusercontent.com/1872314/144534299-a62a234b-2671-467b-9ec7-1cac89f85ff6.png)
+
+Stay tuned for updates and any feedbacks / PRs are welcome 😊
 
 
 ## Zero-setup Action workflows included :sparkles:
@@ -40,30 +77,4 @@ In case you like to see those helper scripts in action without any further manua
 
 ![image](https://user-images.githubusercontent.com/1872314/142614600-83d06471-b0bd-4c7a-81bb-d8836e547e78.png)
 
-### Issue-Ops based workflow
-
-The workflows covered so far have been all triggered as manual GitHub Action jobs. If you start the ["Create branch/PR for schema change"](https://github.com/jonico/pscale-cli-helper-scripts/actions/workflows/create-db-branch-and-pr-dr.yml) workflow, a pull request like [this one](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) will be created that is associated with a PlanetScale deploy request and the desired schema changes. Those schema changes can then be applied by adding a `/ps-merge`comment to the pull request. This IssueOps command will also create [GitHub deployment events](https://docs.github.com/en/rest/guides/delivering-deployments), so that you could have other integrations and Action based workflows [hook into](https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#deployment) the deployment lifecycle.
-
-![image](https://user-images.githubusercontent.com/1872314/143507761-4112d767-ed12-4353-828c-629ac83e9851.png)
-
-You can also create a database branch and deploy request based on an [already existing Pull Request](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) using `/ps-create`:
-![image](https://user-images.githubusercontent.com/1872314/143734380-132bdd39-b4bc-4ec0-b1e8-79d31748542c.png)
-
-If the PlanetScale deploy request or database branch and your pull request both exist already, you can use the `/ps-attach` command, followed by the PlanetScale URL to your branch/DR:
-
-![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
-
-If you like to refresh the schema information of your branch or add additional DDL statements, use `/ps-update`:
-
-![image](https://user-images.githubusercontent.com/1872314/144099735-8e023ecf-31ef-4129-82d0-3aa91d5c9777.png)
-
-Approvals can be done using `/ps-approve`:
-
-![image](https://user-images.githubusercontent.com/1872314/144145346-4263e70e-4eca-4bfe-b2b3-639cca99f1bd.png)
-
-Finally, you can delete the database branch associated with a Git branch using `/ps-delete`:
-
-![image](https://user-images.githubusercontent.com/1872314/144534299-a62a234b-2671-467b-9ec7-1cac89f85ff6.png)
-
-Stay tuned for updates and any feedbacks / PRs are welcome 😊
-
+If you start the ["Create branch/PR for schema change"](https://github.com/jonico/pscale-cli-helper-scripts/actions/workflows/create-db-branch-and-pr-dr.yml) workflow, a pull request like [this one](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) will be created that is associated with a PlanetScale deploy request and the desired schema changes.
