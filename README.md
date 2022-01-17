@@ -2,19 +2,20 @@
 
 📺 [Recording from live demo at PlanetScale Happy-Half-Hour](https://youtu.be/l3oe7srRUZw?t=610)
 
-Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests?
-
-![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
-
-This is a collection of helper scripts and building blocks around the PlanetScale CLI to
-* attach, create, update, approve, merge and delete PlanetScale branches and deploy requests directly from your Pull Requests (see [IssueOps section](#issue-ops-based-workflows))
+This is a collection of GitHub Workflows and general purpose CI/CD helper scripts around [PlanetScale's CLI](https://github.com/planetscale/cli) to
+* [attach, create, update, approve, merge and delete](#issue-ops-based-workflows) PlanetScale branches and deploy requests directly from your Pull Requests
 * [wait for branch creation to be completed](.pscale/cli-helper-scripts/wait-for-branch-readiness.sh)
 * [wait for deploy requests to be successfully merged](.pscale/cli-helper-scripts/wait-for-deploy-request-merged.sh) (and get an update on the current migration status)
 * [DB connection string creation/parsing and extending scope of service tokens](.pscale/cli-helper-scripts/create-database.sh)
-* examples on how create branches and deploy requests ([branches](.pscale/cli-helper-scripts/add-operation-column-and-index.sh), [credentials](.pscale/cli-helper-scripts/create-database.sh), [deploy requests](.pscale/cli-helper-scripts/merge-latest-open-deploy-request.sh))
+* examples on how to create branches and deploy requests ([branches](.pscale/cli-helper-scripts/add-operation-column-and-index.sh), [credentials](.pscale/cli-helper-scripts/create-database.sh), [deploy requests](.pscale/cli-helper-scripts/merge-latest-open-deploy-request.sh)) in any CI/CD environment
 * [creating one-time links](.pscale/cli-helper-scripts/create-branch-connection-string.sh) with connection info for feature branches that correspond to your preview environments
 * [run pscale from a Docker container](.pscale/cli-helper-scripts/use-pscale-docker-image.sh) and still use your local config files, service tokens and port forwarding
 * [delete databases](.pscale/cli-helper-scripts/remove-database.sh)
+
+### IssueOps Example
+
+![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
+([example PR](https://github.com/jonico/pscale-cli-helper-scripts/pull/11))
 
 ## Issue-Ops based workflows
 
@@ -33,6 +34,8 @@ git push
 
 You can create a database branch and deploy request in an [already existing Pull Request](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) using `/ps-create`:
 ![image](https://user-images.githubusercontent.com/1872314/143734380-132bdd39-b4bc-4ec0-b1e8-79d31748542c.png)
+
+See [configuration section](#configuration) for an explanation of the environment variables to set to specify a PlanetScale org and database different from the default settings.
 
 ### /ps-attach: Attach existing PlanetScale branch or Deploy Request to your PR
 
@@ -84,6 +87,8 @@ In case you like to see those helper scripts in action without any further manua
 
 ![image](https://user-images.githubusercontent.com/1872314/142615142-e60164a0-f441-47ee-b92e-ef20e22aca81.png)
 
+See [configuration section](#configuration) for an explanation of the environment variables to set to specify a PlanetScale org and database different from the default settings.
+
 5. When you run the workflows, follow the output where it will ask you to authenticate to PlanetScale by clicking the displayed links.
 
 ![image](https://user-images.githubusercontent.com/1872314/142614600-83d06471-b0bd-4c7a-81bb-d8836e547e78.png)
@@ -91,3 +96,5 @@ In case you like to see those helper scripts in action without any further manua
 If you start the ["Create branch/PR for schema change"](https://github.com/jonico/pscale-cli-helper-scripts/actions/workflows/create-db-branch-and-pr-dr.yml) workflow, a pull request like [this one](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) will be created that is associated with a PlanetScale deploy request and the desired schema changes.
 
 ![image](https://user-images.githubusercontent.com/1872314/144895567-85937eb8-25eb-4066-9863-8e834a108127.png)
+
+## Configuration
