@@ -1,6 +1,6 @@
 
 # Set DB_NAME unless it is already set
-export DB_NAME=${DB_NAME:-matrix-demos-${GITHUB_USER}}
+export DB_NAME=${DB_NAME:-example-db-${GITHUB_USER}}
 echo "Using DB name ${DB_NAME}"
 
 # set org name to first org the user has access to unless it is already set in ORG_NAME
