@@ -49,6 +49,10 @@ The workflows covered so far have been all triggered as manual GitHub Action job
 You can also create a database branch and deploy request based on an [already existing Pull Request](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) using `/ps-create`:
 ![image](https://user-images.githubusercontent.com/1872314/143734380-132bdd39-b4bc-4ec0-b1e8-79d31748542c.png)
 
+If the PlanetScale deploy request or database branch and your pull request both exist already, you can use the `/ps-attach` command, followed by the PlanetScale URL to your branch/DR:
+
+![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
+
 If you like to refresh the schema information of your branch or add additional DDL statements, use `/ps-update`:
 
 ![image](https://user-images.githubusercontent.com/1872314/144099735-8e023ecf-31ef-4129-82d0-3aa91d5c9777.png)
