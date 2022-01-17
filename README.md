@@ -2,7 +2,7 @@
 
 📺 [Recording from live demo at PlanetScale Happy-Half-Hour](https://youtu.be/l3oe7srRUZw?t=610)
 
-This is a collection of GitHub Workflows and general purpose CI/CD helper scripts around [PlanetScale's CLI](https://github.com/planetscale/cli) to
+This is a collection of GitHub Workflows and CI/CD helper scripts around [PlanetScale's database branching workflows](https://docs.planetscale.com/concepts/branching) to
 * [attach, create, update, approve, merge and delete](#issue-ops-based-workflows) PlanetScale branches and deploy requests directly from your Pull Requests
 * [wait for branch creation to be completed](.pscale/cli-helper-scripts/wait-for-branch-readiness.sh)
 * [wait for deploy requests to be successfully merged](.pscale/cli-helper-scripts/wait-for-deploy-request-merged.sh) (and get an update on the current migration status)
