@@ -97,4 +97,6 @@ If you start the ["Create branch/PR for schema change"](https://github.com/jonic
 
 ![image](https://user-images.githubusercontent.com/1872314/144895567-85937eb8-25eb-4066-9863-8e834a108127.png)
 
+If you like to install the workflows in your own repository, follow the [installation steps](#installation).
+
 ## Configuration
