@@ -117,7 +117,10 @@ If you do not like to authorize actions by clicking on authorization links in th
 
 **Note:** While service tokens can be used to work with existing databases, there is currently no scope to create new databases. This is why the scripts / workflows to create entirely new databses will always prompt you to authenticate via the Web UI.
 
+### CI - Runnning in CI
+
+GitHub Actions and many other CI/CD platforms set the **CI** variable to **true** when they run a script. The helper scripts in the [.pscale/cli-helper-scripts/ directory](.pscale/cli-helper-scripts/) will only prompt for interactive user input if the **CI** variable is not set. In CI mode, it will output additional [workflow commands](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions) to standard out to enable communication between GitHub Action workflow steps. If you are using a different CI/CD platform than GitHub Actions, you can ignore all lines starting with "::".
+
 ### Initial table
 
 When you create a bew database from scratch, a default table called `pixel_matrix` will be created. If you like to change this behavior, modify [this file](.pscale/cli-helper-scripts/create-database.sh).
-
