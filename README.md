@@ -4,7 +4,7 @@
 
 Ever wanted to accomplish a complex database workflow with [pscale CLI](https://github.com/planetscale/cli) and needed a way to automate operations like [database branch](https://docs.planetscale.com/concepts/branching) creation or [schema change requests](https://planetscale.com/blog/building-planetscale-with-planetscale) merges? Interested in using the PlanetScale database branching, approval and merging features directly out of your pull/merge requests?
 
-![image](https://user-images.githubusercontent.com/1872314/144895567-85937eb8-25eb-4066-9863-8e834a108127.png)
+![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
 
 This is a collection of helper scripts and building blocks around the PlanetScale CLI to
 * control PlanetScale branches and deploy requests directly from your Pull Requests (see [IssueOps section](#issue-ops-based-workflows))
@@ -89,3 +89,5 @@ In case you like to see those helper scripts in action without any further manua
 ![image](https://user-images.githubusercontent.com/1872314/142614600-83d06471-b0bd-4c7a-81bb-d8836e547e78.png)
 
 If you start the ["Create branch/PR for schema change"](https://github.com/jonico/pscale-cli-helper-scripts/actions/workflows/create-db-branch-and-pr-dr.yml) workflow, a pull request like [this one](https://github.com/jonico/pscale-cli-helper-scripts/pull/2) will be created that is associated with a PlanetScale deploy request and the desired schema changes.
+
+![image](https://user-images.githubusercontent.com/1872314/144895567-85937eb8-25eb-4066-9863-8e834a108127.png)
