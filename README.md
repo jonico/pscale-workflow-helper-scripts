@@ -1,6 +1,7 @@
 # PlanetScale Workflow Helper scripts 
 
 📺 [Recording from live demo at PlanetScale Happy-Half-Hour](https://youtu.be/l3oe7srRUZw?t=610)
+📺 [Longer talk at WeAreDevelopers DevOps Day](https://www.youtube.com/watch?v=ojyZ2KwiXPo&t=10786s)
 
 This is a collection of GitHub Workflows and CI/CD helper scripts around [PlanetScale's database branching workflows](https://docs.planetscale.com/concepts/branching) to
 * [attach, create, update, approve, merge and delete](#issue-ops-based-workflows) PlanetScale branches and deploy requests directly from your Pull Requests
