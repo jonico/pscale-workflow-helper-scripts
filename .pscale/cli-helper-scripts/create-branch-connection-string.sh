@@ -52,5 +52,10 @@ EOF
         echo "$link"
         echo "::set-output name=CONNECTION_STRING_LINK::${link}"
     fi
+    echo
+    echo "Alternatively, you can connect to your new branch like this:"
+    echo "pscale shell \"$DB_NAME\" \"$BRANCH_NAME\" --org \"$ORG_NAME\""
+    echo "or, to create a local tunnel to the database:"
+    echo "pscale connect \"$DB_NAME\" \"$BRANCH_NAME\" --org \"$ORG_NAME\""
     export MY_DB_URL=$DB_URL
 }
