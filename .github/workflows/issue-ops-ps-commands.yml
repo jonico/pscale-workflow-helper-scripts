@@ -464,7 +464,7 @@ jobs:
           BRANCH_NAME: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_NAME }}
           BRANCH_URL: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_URL }}
           DB_NAME: ${{ steps.create-db-branch-and-dr.outputs.DB_NAME }}
-          ORG_NAME: ${{ steps.create-db-branch-and-dr.ORG_NAME }}
+          ORG_NAME: ${{ steps.create-db-branch-and-dr.outputs.ORG_NAME }}
           DDL_STATEMENTS: ${{ steps.validate_params.outputs.DDL_STATEMENTS }}
           BRANCH_DIFF: ${{ steps.create-db-branch-and-dr.outputs.BRANCH_DIFF }}
         with:
@@ -481,11 +481,12 @@ jobs:
             * :lock: __Branch connection info__: [One-time link](${{ steps.create-db-branch-and-dr.outputs.CONNECTION_STRING_LINK }})
 
             <details>
-            <summary>:scroll: Proposed DDL-Statements:</summary>
-            
-            \`\`\`
-            ${DDL_STATEMENTS}
-            \`\`\`
+            <summary>:computer: pscale CLI commands for local access</summary>
+
+              \`\`\`
+              pscale shell "${DB_NAME}" "${BRANCH_NAME}" --org "${ORG_NAME}"
+              pscale connect "${DB_NAME}" "${BRANCH_NAME}" --org "${ORG_NAME}"
+              \`\`\`
 
             </details>
 
@@ -664,7 +665,7 @@ jobs:
             BRANCH_NAME: ${{ steps.update-db-branch.outputs.BRANCH_NAME }}
             BRANCH_URL: ${{ steps.update-db-branch.outputs.BRANCH_URL }}
             DB_NAME: ${{ steps.update-db-branch.outputs.DB_NAME }}
-            ORG_NAME: ${{ steps.update-db-branch.ORG_NAME }}
+            ORG_NAME: ${{ steps.update-db-branch.outputs.ORG_NAME }}
             DDL_STATEMENTS: ${{ steps.validate_params.outputs.DDL_STATEMENTS }}
             BRANCH_DIFF: ${{ steps.update-db-branch.outputs.BRANCH_DIFF }}
           with:
@@ -680,13 +681,12 @@ jobs:
               * :train2: [Deploy request](${DEPLOY_REQUEST_URL})
 
               <details>
-              <summary>:scroll: Added DDL-Statements:</summary>
-              
-              \`\`\`
-              ${DDL_STATEMENTS}
-              \`\`\`
+              <summary>:computer: pscale CLI commands for local access</summary>
 
-              </details>
+              \`\`\`
+              pscale shell "${DB_NAME}" "${BRANCH_NAME}" --org "${ORG_NAME}"
+              pscale connect "${DB_NAME}" "${BRANCH_NAME}" --org "${ORG_NAME}"
+              \`\`\`
 
               <details>
               <summary>📖 Calculated schema changes:</summary>
@@ -1228,7 +1228,7 @@ jobs:
           BRANCH_NAME: ${{ steps.retrieve-attached-info.outputs.BRANCH_NAME }}
           BRANCH_URL: ${{ steps.retrieve-attached-info.outputs.BRANCH_URL }}
           DB_NAME: ${{ steps.retrieve-attached-info.outputs.DB_NAME }}
-          ORG_NAME: ${{ steps.retrieve-attached-info.ORG_NAME }}
+          ORG_NAME: ${{ steps.retrieve-attached-info.outputs.ORG_NAME }}
           BRANCH_DIFF: ${{ steps.retrieve-attached-info.outputs.BRANCH_DIFF }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -1242,6 +1242,16 @@ jobs:
             * :seedling: __DB-Branch__: [${BRANCH_NAME}](${BRANCH_URL})
             * :train2: [Deploy request](${DEPLOY_REQUEST_URL})
             * :lock: __Branch connection info__: [One-time link](${{ steps.retrieve-attached-info.outputs.CONNECTION_STRING_LINK }})
+
+            <details>
+            <summary>:computer: pscale CLI commands for local access</summary>
+
+              \`\`\`
+              pscale shell "${DB_NAME}" "${BRANCH_NAME}" --org "${ORG_NAME}"
+              pscale connect "${DB_NAME}" "${BRANCH_NAME}" --org "${ORG_NAME}"
+              \`\`\`
+
+            </details>
 
             <details>
             <summary>📖 Calculated schema changes:</summary>

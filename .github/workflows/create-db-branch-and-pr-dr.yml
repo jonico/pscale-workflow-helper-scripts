@@ -103,6 +103,20 @@ jobs:
               * :lock: __Branch connection info__: [One-time link](${{ steps.create-db-branch-and-dr.outputs.CONNECTION_STRING_LINK }})
 
               <details>
+              <summary>:computer: pscale CLI commands for local access</summary>
+
+
+              ```
+
+              pscale shell "${{ steps.create-db-branch-and-dr.outputs.DB_NAME }}" "${{ steps.create-db-branch-and-dr.outputs.BRANCH_NAME }}" --org "${{ steps.create-db-branch-and-dr.outputs.ORG_NAME }}"
+
+              pscale connect "${{ steps.create-db-branch-and-dr.outputs.DB_NAME }}" "${{ steps.create-db-branch-and-dr.outputs.BRANCH_NAME }}" --org "${{ steps.create-db-branch-and-dr.outputs.ORG_NAME }}"   
+              
+              ```
+
+              </details>
+
+              <details>
               <summary>:scroll: Proposed DDL-Statements:</summary>
 
               
