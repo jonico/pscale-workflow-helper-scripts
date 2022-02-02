@@ -24,7 +24,7 @@ rm ${PSCALE_CLI_HELPER_SCRIPTS_NAME}.zip
 rm -rf ${PSCALE_CLI_HELPER_SCRIPTS_NAME}-${RELEASE_VERSION}
 
 echo
-echo "Successfully installed pscale-cli-helper-scripts"
+echo "Successfully installed pscale-workflow-helper-scripts"
 echo
 echo "Please run 'git add .pscale .github/workflows' and commit changes using 'git commit -m \"Add pscale helper scripts and IssueOps workflows\"'"
 echo "Then run 'git push' to push changes"
