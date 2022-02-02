@@ -1,7 +1,7 @@
 #!/bin/bash
 
 RELEASE_VERSION=0.2
-PSCALE_CLI_HELPER_SCRIPTS_NAME=pscale-cli-helper-scripts
+PSCALE_CLI_HELPER_SCRIPTS_NAME=pscale-workflow-helper-scripts
 PSCALE_SCRIPTS_DIR=.pscale/
 
 curl -L -o ${PSCALE_CLI_HELPER_SCRIPTS_NAME}.zip https://github.com/jonico/pscale-cli-helper-scripts/archive/refs/tags/${RELEASE_VERSION}.zip
