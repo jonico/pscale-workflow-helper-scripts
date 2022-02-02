@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RELEASE_VERSION=0.1
+RELEASE_VERSION=0.2
 PSCALE_CLI_HELPER_SCRIPTS_NAME=pscale-cli-helper-scripts
 PSCALE_SCRIPTS_DIR=.pscale/
 
