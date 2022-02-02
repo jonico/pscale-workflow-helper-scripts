@@ -115,9 +115,9 @@ All scripts and IssueOps command in this repo have been designed to run successf
 
 ***ORG_NAME*** is name of your PlanetScale organization. Unless you [attach](#ps-attach-attach-existing-planetscale-branch-or-deploy-request-to-your-pr) a specific branch or deploy request to your PR, it defaults to the first PlanetScale org you joined with your account. If you rather like to change the source for the default DB name, it would be [this file](.pscale/cli-helper-scripts/set-db-and-org-and-branch-name.sh).
 
-### PLANETSCALE_SERVICE_TOKEN_NAME and PLANETSCALE_SERVICE_TOKEN
+### PLANETSCALE_SERVICE_TOKEN_ID and PLANETSCALE_SERVICE_TOKEN
 
-If you do not like to authorize actions by clicking on authorization links in the browser, you can [create PlanetScale service tokens](https://docs.planetscale.com/reference/service-tokens#create-service-tokens-using-the-planetscale-ui). Don't forget to set the [proper scopes](https://docs.planetscale.com/reference/service-tokens#add-database-access-permissions) for the database operations you like to automate.
+If you do not like to authorize actions by clicking on authorization links in the browser, you can [create a PlanetScale service token](https://docs.planetscale.com/reference/service-tokens#create-service-tokens-using-the-planetscale-ui). Don't forget to set the [proper scopes](https://docs.planetscale.com/reference/service-tokens#add-database-access-permissions) for the database operations you like to automate.
 
 **Note:** While service tokens can be used to work with existing databases, there is currently no scope to create new databases. This is why the scripts / workflows to create entirely new databses will always prompt you to authenticate via the Web UI.
 
