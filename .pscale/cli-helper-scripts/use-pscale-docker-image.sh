@@ -6,8 +6,11 @@ function pscale {
     local non_interactive=""
     local command=""
     
-    # if first arg equals shell, we have to turn off pseudo-tty and set PSCALE_ALLOW_NONINTERACTIVE_SHELL=true
-    if [ "$1" = "shell" ]; then
+    # if first arg equals shell, and we are getting input piped in we have to turn off pseudo-tty and set PSCALE_ALLOW_NONINTERACTIVE_SHELL=true
+    if [ "$1" = "shell" ] &&  ! [[ -t 0 ]]; then
+        tty=""
+        non_interactive="-e PSCALE_ALLOW_NONINTERACTIVE_SHELL=true"
+    fi
         tty=""
         non_interactive="-e PSCALE_ALLOW_NONINTERACTIVE_SHELL=true"
     fi
