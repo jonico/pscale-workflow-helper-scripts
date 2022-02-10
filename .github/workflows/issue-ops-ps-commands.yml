@@ -449,6 +449,7 @@ jobs:
           mkdir -p ../env/
           envsubst < ps-env-template.sh > ../env/ps-env-${REF}.sh
           chmod a+x ../env/ps-env-${REF}.sh
+          rm -f typescript
 
       - name: Commit changes
         uses: elstudio/actions-js-build/commit@v4
@@ -1213,6 +1214,7 @@ jobs:
           mkdir -p ../env/
           envsubst < ps-env-template.sh > ../env/ps-env-${REF}.sh
           chmod a+x ../env/ps-env-${REF}.sh
+          rm -f typescript
           
       - name: Commit changes
         uses: elstudio/actions-js-build/commit@v4
