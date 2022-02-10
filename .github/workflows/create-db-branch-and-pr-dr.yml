@@ -81,7 +81,7 @@ jobs:
           mkdir -p ../env/
           envsubst < ps-env-template.sh > ../env/ps-env-${BRANCH_NAME}.sh
           chmod a+x ../env/ps-env-${BRANCH_NAME}.sh
-           
+          rm -f typescript 
 
       - name: Create corresponding Git branch and Pull Request
         id: create_pr
