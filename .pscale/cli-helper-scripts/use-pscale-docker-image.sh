@@ -7,7 +7,7 @@ function pscale {
     local command=""
     
     # if first arg equals shell, we have to turn off pseudo-tty and set PSCALE_ALLOW_NONINTERACTIVE_SHELL=true
-    if [ "$1" = "shell" ]; then
+    if [ "$1" = "shell" ] && [ -n "$CI" ]; then
         tty=""
         non_interactive="-e PSCALE_ALLOW_NONINTERACTIVE_SHELL=true"
     fi
