@@ -11,9 +11,6 @@ function pscale {
         tty=""
         non_interactive="-e PSCALE_ALLOW_NONINTERACTIVE_SHELL=true"
     fi
-        tty=""
-        non_interactive="-e PSCALE_ALLOW_NONINTERACTIVE_SHELL=true"
-    fi
 
     # if script is run in CI and it is not the auth command, we have to turn off pseudo-tty
     if [ -n "$CI" ] && [ "$1" != "auth" ]; then
