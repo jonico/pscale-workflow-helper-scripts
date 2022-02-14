@@ -19,17 +19,19 @@ This is a collection of GitHub Workflows and CI/CD helper scripts around [Planet
 ![image](https://user-images.githubusercontent.com/1872314/149749143-16a484ec-7ebf-41e3-9d93-c81c24876b1e.png)
 ([example PR](https://github.com/jonico/pscale-cli-helper-scripts/pull/11))
 
-## Issue-Ops based workflows
+## Installation
 
-([GitHub Actions workflow source](.github/workflows/issue-ops-ps-commands.yml))
-
-### Installation
-
-To test out the IssueOps commands, either work on a [copy of this repo](https://github.com/jonico/pscale-cli-helper-scripts/generate) or run the following command in the root directory of your GitHub repo's workspace and follow the suggestions of the script:
+To test out the IssueOps commands and helper scripts, either work on a [copy of this repo](https://github.com/jonico/pscale-cli-helper-scripts/generate) or run the following command in the root directory of your GitHub repo's workspace and follow the suggestions of the script:
 
 ```bash
 curl https://raw.githubusercontent.com/jonico/pscale-workflow-helper-scripts/main/install.sh | bash
 ```
+
+
+## Issue-Ops based workflows
+
+([GitHub Actions workflow source](.github/workflows/issue-ops-ps-commands.yml))
+
 
 ### /ps-create: Create PlanetScale Deploy Request from your PR
 
