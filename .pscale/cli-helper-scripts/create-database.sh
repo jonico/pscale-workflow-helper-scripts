@@ -38,9 +38,9 @@ fi
 pscale branch promote "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME"
 
 # grant service token permission to use the database if service token is set
-if [ -n "$PLANETSCALE_SERVICE_TOKEN_NAME" ]; then
+if [ -n "$PLANETSCALE_SERVICE_TOKEN_ID" ]; then
   echo "Granting access to new database for service tokens ..."
-  pscale service-token add-access "$PLANETSCALE_SERVICE_TOKEN_NAME" approve_deploy_request connect_branch create_branch create_comment create_deploy_request delete_branch read_branch read_deploy_request connect_production_branch  --database "$DB_NAME" --org "$ORG_NAME"
+  pscale service-token add-access "$PLANETSCALE_SERVICE_TOKEN_ID" approve_deploy_request connect_branch create_branch create_comment create_deploy_request delete_branch read_branch read_deploy_request connect_production_branch  --database "$DB_NAME" --org "$ORG_NAME"
 fi
 
 . create-branch-connection-string.sh

@@ -189,7 +189,7 @@ jobs:
         id: merge-dr
         timeout-minutes: 10
         env:
-          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
           PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
           GITHUB_USER: ${{github.actor}}
           REF: ${{ needs.prechecks.outputs.ref }}
@@ -424,7 +424,7 @@ jobs:
         id: create-db-branch-and-dr
         timeout-minutes: 5
         env:
-          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
           PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
           DB_NAME: ${{secrets.DB_NAME}}
           ORG_NAME: ${{secrets.ORG_NAME}}
@@ -649,7 +649,7 @@ jobs:
           id: update-db-branch
           timeout-minutes: 3
           env:
-            PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+            PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
             PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
             REF: ${{ needs.prechecks.outputs.ref }}
             GITHUB_USER: ${{github.actor}}
@@ -844,7 +844,7 @@ jobs:
           id: approve-deploy-request
           timeout-minutes: 3
           env:
-            PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+            PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
             PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
             REF: ${{ needs.prechecks.outputs.ref }}
             GITHUB_USER: ${{github.actor}}
@@ -1009,7 +1009,7 @@ jobs:
           id: delete-db-branch
           timeout-minutes: 3
           env:
-            PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+            PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
             PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
             REF: ${{ needs.prechecks.outputs.ref }}
             GITHUB_USER: ${{github.actor}}
@@ -1185,7 +1185,7 @@ jobs:
         timeout-minutes: 3
         env:
           REF: ${{needs.prechecks.outputs.ref}}
-          PLANETSCALE_SERVICE_TOKEN_NAME: ${{secrets.PLANETSCALE_SERVICE_TOKEN_NAME}}
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
           PLANETSCALE_SERVICE_TOKEN: ${{secrets.PLANETSCALE_SERVICE_TOKEN}}
           DB_NAME: ${{steps.validate_params.outputs.DB_NAME}}
           ORG_NAME: ${{steps.validate_params.outputs.ORG_NAME}}
