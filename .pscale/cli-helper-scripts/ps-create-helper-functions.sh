@@ -220,7 +220,7 @@ function create-deployment {
         echo "Check out the deploy request status at $deploy_request"
         exit 5
     else
-        echo "Check out the deploy request merged at $deploy_request"
+        echo "Check out the deploy request at $deploy_request"
     fi
 
 }
