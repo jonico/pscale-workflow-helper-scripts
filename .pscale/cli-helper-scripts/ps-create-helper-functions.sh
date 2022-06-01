@@ -176,8 +176,8 @@ function create-diff-for-ci {
         BRANCH_DIFF="${BRANCH_DIFF//'%'/'%25'}"
         BRANCH_DIFF="${BRANCH_DIFF//'\n'/'%0A'}"
         BRANCH_DIFF="${BRANCH_DIFF//'\r'/'%0D'}"
-        # replace tabs with URL encoded spaces
-        BRANCH_DIFF="${BRANCH_DIFF//'\t'/'%09'}"
+        # replace tabs with whitespace
+        BRANCH_DIFF="${BRANCH_DIFF//'\t'/' '}"
 
         echo "::set-output name=BRANCH_DIFF::$BRANCH_DIFF"
     fi
