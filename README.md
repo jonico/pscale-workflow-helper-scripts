@@ -1,4 +1,4 @@
-# PlanetScale Workflow Helper scripts 
+# PlanetScale Workflow Helper scripts - Test ps-attach
 
 📺 [DevOpsPro Talk](https://youtu.be/CafDHLmHf2s)
 
