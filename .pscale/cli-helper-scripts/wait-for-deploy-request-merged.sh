@@ -24,7 +24,7 @@ function wait_for_deploy_request_merged {
         fi
         local output=`echo $raw_output | jq ".[] | select(.number == $number) | .deployment.state"`
         # test whether output is pending, if so, increase wait timeout exponentially
-        if [ "$output" = "\"pending\"" ] || [ "$output" = "\"in_progress\"" ]; then
+        if [ "$output" = "\"pending\"" ] || [ "$output" = "\"in_progress\"" ] || [ "$output" = "\"submitting\"" ]; then
             # increase wait variable exponentially but only if it is less than max_timeout
             if [ $((wait * 2)) -le $max_timeout ]; then
                 wait=$((wait * 2))
