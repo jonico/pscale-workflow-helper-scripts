@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RELEASE_VERSION=0.5
+RELEASE_VERSION=0.6
 PSCALE_CLI_HELPER_SCRIPTS_NAME=pscale-workflow-helper-scripts
 PSCALE_SCRIPTS_DIR=.pscale/
 
